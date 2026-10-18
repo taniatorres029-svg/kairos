@@ -109,19 +109,22 @@ details.more[open] summary::before{content:"− "}
 .pt.col .ptbody{display:none}
 /* Menú de módulos */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:12px}
-.tile{position:relative;display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px 14px;min-height:96px;box-shadow:0 1px 2px rgba(40,20,60,.04);transition:transform .12s ease,box-shadow .12s ease;width:100%}
-.tile:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(40,20,60,.08)}
+.tile{position:relative;display:flex;gap:14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-height:84px;box-shadow:0 1px 2px rgba(40,20,60,.04);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;width:100%}
+.tile:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(40,20,60,.08);border-color:var(--c)}
 .tile:active{transform:translateY(0)}
-.tile .ic{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--t);color:var(--c)}
-.tile .ic svg{width:26px;height:26px}
-.tile .num{font-family:var(--f-mono);font-size:.72rem;color:var(--c);font-weight:500}
-.tile .tt{display:block;font-weight:700;font-size:1.04rem;line-height:1.25;margin-top:1px}
-.tile .ds{display:block;color:var(--muted);font-size:.84rem;margin-top:3px;line-height:1.35}
-.tile .st{position:absolute;top:10px;right:12px;font-size:.7rem;font-weight:700;color:var(--c);background:var(--t);border-radius:999px;padding:2px 8px}
-.tile::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:var(--c)}
+.tile .ic{position:relative;flex:none;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--t);color:var(--c)}
+.tile .ic svg{width:30px;height:30px}
+.tile .num{position:absolute;top:-6px;left:-6px;width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--surface);font-size:.72rem;font-weight:700;display:grid;place-items:center;border:2px solid var(--surface)}
+.tile .tx{flex:1;min-width:0}
+.tile .tt{display:block;font-weight:700;font-size:1.08rem;line-height:1.25}
+.tile .ds{display:block;color:var(--muted);font-size:.88rem;margin-top:3px;line-height:1.35}
+.tile .go{flex:none;color:var(--c);width:22px;height:22px}
+.tile .st{display:inline-block;margin-left:6px;vertical-align:2px;font-size:.66rem;font-weight:700;color:var(--c);background:var(--t);border-radius:999px;padding:1px 7px}
+@media (prefers-reduced-motion:reduce){.tile{transition:none}.tile:hover{transform:none}}
 
 footer.own{margin-top:26px;border-top:1px solid var(--accent-line);padding-top:12px;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:5px}
 footer.own b{color:var(--ink)}
+footer.own .nv{font-weight:700;color:var(--ink);font-size:.86rem}
 
 /* Vista de módulo */
 body.inmod{overflow:hidden}
@@ -208,18 +211,6 @@ pre.rx{white-space:pre-wrap;font-family:var(--f-mono);font-size:.8rem;background
         <label class="f">ECOG<select id="r_ecog" data-r="ecog"><option value="">—</option><option value="0">0 · Activo</option><option value="1">1 · Restringido</option><option value="2">2 · Autocuidado</option><option value="3">3 · Cama &gt; 50 %</option><option value="4">4 · Encamado</option></select></label>
         <label class="chk w2"><input id="r_fragil" type="checkbox" data-r="fragil"> Fragilidad o caquexia</label>
       </div>
-      <details class="more" id="moreDet">
-        <summary>Más datos (laboratorio y peso habitual)</summary>
-        <div class="fields" style="margin-top:8px">
-          <label class="f w2">Sitio primario (cáncer)<select id="r_prim" data-r="prim"><option value="">—</option><option value="pulmon">Pulmón</option><option value="mama">Mama</option><option value="prostata">Próstata</option><option value="colon">Colon</option><option value="recto">Recto</option><option value="pancreas">Páncreas</option><option value="estomago">Estómago</option><option value="esofago">Esófago</option><option value="higado">Hígado</option><option value="biliar">Vesícula / vías biliares</option><option value="vejiga">Vejiga</option><option value="rinon">Riñón</option><option value="utero">Útero / cérvix</option><option value="ovario">Ovario</option><option value="tiroides">Tiroides</option><option value="cyc">Cabeza y cuello</option><option value="melanoma">Melanoma</option><option value="mesot">Mesotelioma</option><option value="osteos">Osteosarcoma</option><option value="sarcoma">Otro sarcoma</option><option value="carcinoide">Carcinoide / neuroendocrino</option><option value="linfoma">Linfoma</option><option value="leucemia">Leucemia</option><option value="mieloma">Mieloma</option><option value="descon">Primario desconocido</option><option value="otro">Otro</option></select></label>
-          <label class="f">Peso habitual (kg)<input id="r_pesoHab" type="number" inputmode="decimal" min="20" max="250" step="0.1" data-r="pesoHab"></label>
-          <label class="f">Desde hace<select id="r_tPer" data-r="tPer"><option value="">—</option><option value="1">1 mes</option><option value="2">2 meses</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">Más de 6 meses</option></select></label>
-          <label class="f">Albúmina (g/dL)<input id="r_alb" type="number" inputmode="decimal" step="0.1" min="0.5" max="6" data-r="alb"></label>
-          <label class="f">PCR (mg/L)<input id="r_pcr" type="number" inputmode="decimal" step="0.1" min="0" max="500" data-r="pcr"></label>
-          <label class="f">Sodio (mEq/L)<input id="r_na" type="number" inputmode="numeric" min="100" max="170" data-r="na"></label>
-        </div>
-        <p class="msg" style="margin:8px 0 0">Peso habitual: el que tenía antes de enfermar. Con él y el tiempo se calcula la pérdida de peso; si no indica el tiempo se asume 6 meses.</p>
-      </details>
       <div class="calc" id="calc"></div>
       </div>
       <div class="ptbtns">
@@ -236,7 +227,7 @@ pre.rx{white-space:pre-wrap;font-family:var(--f-mono);font-size:.8rem;background
 
   <footer class="own">
     <span><b>© 2026 Dra. Gabriela Alejandra López Ortiz.</b> Herramienta de su propiedad, para uso exclusivo médico. Prohibida su reproducción o distribución sin autorización.</span>
-    <span><b>Herramienta no validada.</b> KAIRÓS y sus módulos no han sido validados clínicamente ni aprobados por ninguna autoridad sanitaria. Son un apoyo para el médico tratante, quien es responsable de verificar cada dosis y cada decisión.</span>
+    <span class="nv">Herramienta no validada</span>
     <span>No envía datos a internet. Los datos del paciente se borran al cerrar la pestaña o con «Nuevo paciente».</span>
     <span>Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco · 311 204 87 63 · dra.gabyttc@gmail.com · @dra.gaby_lopez_ortiz</span>
   </footer>
@@ -287,12 +278,12 @@ var ICONS={
   nota:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/></svg>'
 };
 var META=[
-  {id:'integral',  b:'Valoración integral', t:'Valoración paliativa integral', c:'Esferas', d:'Síntomas, dolor, delirium, funcionalidad, psicoemocional, espiritual, familia, decisiones y pronóstico. Diagnóstico paliativo, complejidad IDC-Pal y plan.'},
-  {id:'pronostico',b:'Pronóstico', t:'Pronóstico de supervivencia', c:'Pronóstico', d:'PPS, PaP, D-PaP, PPI, mGPS, LENT, Tokuhashi, MELD, BODE, FAST y más, con guía de a quién aplica cada escala.'},
-  {id:'opioides',  b:'Rotación de opioides', t:'Rotación de opioides', c:'Opioides', d:'Dosis equivalente de morfina, reducción por tolerancia cruzada, ajuste renal y hepático, rescates y metadona.'},
-  {id:'nutricion', b:'Nutrición', t:'Soporte nutricional', c:'Nutrición', d:'Tamizaje, caquexia (Fearon), metas de energía y proteína según escenario y suplementos disponibles en México.'},
-  {id:'sedacion',  b:'Sedación paliativa', t:'Sedación paliativa', c:'Sedación', d:'Bomba subcutánea continua o intermitente, grado de sedación con RASS-PAL, midazolam, opioide y adyuvantes.'},
-  {id:'nota',      t:'Nota médica integrada', c:'Nota', d:'Une en un solo texto las notas de los módulos que usó con este paciente, lista para copiar al expediente.'}
+  {id:'integral',  b:'Valoración integral', t:'Valoración paliativa integral', c:'Integral', d:'Evalúa todas las esferas y obtén diagnóstico y plan.'},
+  {id:'pronostico',b:'Pronóstico', t:'Pronóstico de supervivencia', c:'Pronóstico', d:'Elige la escala que aplica y estima la supervivencia.'},
+  {id:'opioides',  b:'Rotación de opioides', t:'Rotación de opioides', c:'Opioides', d:'Cambia de opioide con la dosis equivalente segura.'},
+  {id:'nutricion', b:'Nutrición', t:'Soporte nutricional', c:'Nutrición', d:'Define metas de energía, proteína y suplemento.'},
+  {id:'sedacion',  b:'Sedación paliativa', t:'Sedación paliativa', c:'Sedación', d:'Prepara la bomba subcutánea paso a paso.'},
+  {id:'nota',      t:'Nota médica integrada', c:'Nota', d:'Une todo en una sola nota para el expediente.'}
 ];
 function meta(id){ for(var i=0;i<META.length;i++) if(META[i].id===id) return META[i]; }
 
@@ -333,7 +324,6 @@ function regVal(k){
 function fillCard(){
   KEYS.forEach(function(k){ var el=$('r_'+k); if(!el) return; var v=REG[k];
     if(el.type==='checkbox') el.checked=!!v; else el.value=(v==null?'':v); });
-  if(REG.prim||REG.pesoHab||REG.tPer||REG.alb||REG.pcr||REG.na) $('moreDet').open=true;
   renderCalc(); sumUpd();
 }
 function renderCalc(){
@@ -444,8 +434,9 @@ function resetFrames(){ Object.keys(frames).forEach(function(id){ frames[id].rem
 function renderTiles(){
   $('tiles').innerHTML=META.map(function(m,i){
     var st=m.id==='nota'?'':(frames[m.id]?'<span class="st">En curso</span>':'');
-    return '<button type="button" class="tile" data-go="'+m.id+'" style="--c:var(--c-'+m.id+');--t:var(--t-'+m.id+')">'+st+
-      '<span class="ic">'+ICONS[m.id]+'</span><span><span class="num">'+(i+1<10?'0':'')+(i+1)+' · '+m.c+'</span><span class="tt">'+m.t+'</span><span class="ds">'+m.d+'</span></span></button>';
+    return '<button type="button" class="tile" data-go="'+m.id+'" style="--c:var(--c-'+m.id+');--t:var(--t-'+m.id+')">'+
+      '<span class="ic">'+ICONS[m.id]+'<span class="num">'+(i+1)+'</span></span><span class="tx"><span class="tt">'+m.t+st+'</span><span class="ds">'+m.d+'</span></span>'+
+      '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
   }).join('');
 }
 $('tiles').addEventListener('click',function(e){ var b=e.target.closest('[data-go]'); if(b) go(b.getAttribute('data-go')); });
