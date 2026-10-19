@@ -244,7 +244,7 @@ pre.rx{white-space:pre-wrap;font-family:var(--f-mono);font-size:.8rem;background
   <footer class="own">
     <span><b>© 2026 Dra. Gabriela Alejandra López Ortiz.</b> Herramienta de su propiedad, para uso exclusivo médico. Prohibida su reproducción o distribución sin autorización.</span>
     <span>No envía datos a internet. Los datos del paciente se borran al cerrar la pestaña o con «Nuevo paciente».</span>
-    <span>Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco · 311 204 87 63 · dra.gabyttc@gmail.com · @dra.gaby_lopez_ortiz</span>
+    <span>Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco · Urgencias 311 204 87 63 · Citas por WhatsApp 33 4480 1259 · alleviarecarehome.com · dra.gabyttc@gmail.com · @dra.gaby_lopez_ortiz</span>
   </footer>
 </main>
 
@@ -1007,6 +1007,8 @@ function hacerPDF(secs,titulo){
     else if(k==='tel'){ d.roundedRect(x+1.2,cy-3.2,3.8,6.4,0.8,0.8,'S'); d.line(x+2.4,cy-2.2,x+3.8,cy-2.2); }
     else if(k==='mail'){ d.rect(x,cy-2.4,6.4,4.8,'S'); d.line(x,cy-2.4,x+3.2,cy+0.4); d.line(x+3.2,cy+0.4,x+6.4,cy-2.4); }
     else if(k==='ig'){ d.roundedRect(x,cy-3,6,6,1.7,1.7,'S'); d.circle(x+3,cy,1.35,'S'); d.circle(x+4.7,cy-1.7,0.3,'F'); }
+    else if(k==='wa'){ d.circle(x+3,cy,2.9,'S'); d.triangle(x+0.6,cy+3.4,x+1.2,cy+1.4,x+2.4,cy+2.4,'F'); }
+    else if(k==='yt'){ d.roundedRect(x,cy-2.4,6.6,4.8,1.3,1.3,'F'); col(WHITE,'setFillColor'); d.triangle(x+2.6,cy-1.3,x+2.6,cy+1.3,x+4.6,cy,'F'); }
     else if(k==='web'){ d.circle(x+3,cy,3,'S'); d.ellipse(x+3,cy,1.3,3,'S'); d.line(x,cy,x+6,cy); } }
   function membrete(){
     try{ d.addImage(MEMB,'JPEG',0,0,PW,PH,'memb','FAST'); }catch(e){}
@@ -1020,10 +1022,9 @@ function hacerPDF(secs,titulo){
     col(LILAC,'setFillColor'); d.roundedRect(X1-96,62,96,2.2,1.1,1.1,'F');
     fnt('normal',8,GRAY); txt('Fecha: '+hoy(),X1,78,{align:'right'});
     col(LILAC,'setDrawColor'); d.setLineWidth(0.6); d.line(X0,740,X1,740);
-    var x=X0, items=[['pin','Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco'],['tel','311 204 87 63'],['mail','dra.gabyttc@gmail.com'],['ig','@dra.gaby_lopez_ortiz']];
-    fnt('normal',7.3,GRAY);
-    items.forEach(function(it){ ico(it[0],x,750.5); fnt('normal',7.3,GRAY); txt(it[1],x+9.5,753); x+=9.5+d.getTextWidth(win(it[1]))+13; });
-    ico('web',X0,761.5); fnt('normal',7.3,GRAY); txt('www.doctoralia.com.mx/gabriela-alejandra-lopez-ortiz/anestesiologo/guadalajara',X0+9.5,764);
+    function fila(items,yy){ var x=X0; items.forEach(function(it){ ico(it[0],x,yy-2.5); fnt('normal',7.3,GRAY); txt(it[1],x+9.5,yy); x+=9.5+d.getTextWidth(win(it[1]))+13; }); }
+    fila([['pin','Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco'],['tel','Urgencias 311 204 87 63'],['wa','Citas por WhatsApp 33 4480 1259']],753);
+    fila([['web','alleviarecarehome.com'],['mail','dra.gabyttc@gmail.com'],['ig','@dra.gaby_lopez_ortiz'],['yt','YouTube @gabrielaalejandralopezorti4979']],764);
   }
   function nueva(){ d.addPage(); membrete(); y=TOP; }
   function hay(h){ if(y+h>BOT){ nueva(); return true; } return false; }
