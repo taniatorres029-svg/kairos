@@ -23,6 +23,7 @@
   --c-nutricion:#3A7A4C; --t-nutricion:#E6F3E9;
   --c-sedacion:#5547A6; --t-sedacion:#ECEAFA;
   --c-nota:#8A6A1F; --t-nota:#F8F0DC;
+  --c-docs:#A0446E; --t-docs:#FBE7F0;
   --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -35,14 +36,14 @@
   --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
   --c-integral:#C7A6DE; --t-integral:#2E2338; --c-pronostico:#7EC3E0; --t-pronostico:#16303B;
   --c-opioides:#F0A07C; --t-opioides:#3A2219; --c-nutricion:#8FD1A0; --t-nutricion:#183022;
-  --c-sedacion:#AFA6F2; --t-sedacion:#25213F; --c-nota:#E6C46E; --t-nota:#352A10; color-scheme:dark}}
+  --c-sedacion:#AFA6F2; --t-sedacion:#25213F; --c-nota:#E6C46E; --t-nota:#352A10; --c-docs:#F0A3C4; --t-docs:#3A1B2A; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17121A; --surface:#211A25; --ink:#EEE7F1; --muted:#B3A6BA; --line:#382E3E;
   --accent:#C7A6DE; --accent-ink:#1E1622; --accent-soft:#2E2338; --accent-line:#4E3B5C;
   --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
   --c-integral:#C7A6DE; --t-integral:#2E2338; --c-pronostico:#7EC3E0; --t-pronostico:#16303B;
   --c-opioides:#F0A07C; --t-opioides:#3A2219; --c-nutricion:#8FD1A0; --t-nutricion:#183022;
-  --c-sedacion:#AFA6F2; --t-sedacion:#25213F; --c-nota:#E6C46E; --t-nota:#352A10; color-scheme:dark}
+  --c-sedacion:#AFA6F2; --t-sedacion:#25213F; --c-nota:#E6C46E; --t-nota:#352A10; --c-docs:#F0A3C4; --t-docs:#3A1B2A; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
@@ -123,6 +124,7 @@ details.more[open] summary::before{content:"− "}
 .tile{position:relative;display:flex;gap:14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-height:84px;box-shadow:0 1px 2px rgba(40,20,60,.04);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;width:100%}
 .tile:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(40,20,60,.08);border-color:var(--c)}
 .tile:active{transform:translateY(0)}
+a.tile{text-decoration:none;color:inherit}
 .tile .ic{position:relative;flex:none;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--t);color:var(--c)}
 .tile .ic svg{width:30px;height:30px}
 .tile .num{position:absolute;top:-6px;left:-6px;width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--surface);font-size:.72rem;font-weight:700;display:grid;place-items:center;border:2px solid var(--surface)}
@@ -239,6 +241,7 @@ pre.rx{white-space:pre-wrap;font-family:var(--f-mono);font-size:.8rem;background
   <section class="sec" aria-labelledby="mnH">
     <div class="sec-h"><h2 id="mnH"><span class="n">2</span>¿Qué quiere hacer?</h2><p>Toque una opción. Puede entrar a varias con el mismo paciente.</p></div>
     <div class="tiles" id="tiles"></div>
+    <div class="tiles" style="margin-top:12px"><a class="tile" href="documentos/" style="--c:var(--c-docs);--t:var(--t-docs)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7a4 4 0 0 1 0 8H6zM6 11v10M10 11l8 10M18 13l-6 8"/></svg><span class="num">7</span></span><span class="tx"><span class="tt">Recetas y documentos</span><span class="ds">Receta, indicaciones, constancia, resumen médico y parte médico, en PDF con membrete.</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a></div>
   </section>
 
   <footer class="own">

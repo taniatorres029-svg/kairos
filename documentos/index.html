@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Recetas y documentos · KAIRÓS</title>
+<link rel="icon" href="logo.jpg">
+<link rel="apple-touch-icon" href="logo.jpg">
+<style>
+/* Recetas y documentos médicos de la Dra. Gaby. Sin tipografías externas: abre al instante en el teléfono.
+   El PDF (jsPDF + membrete) se descarga aparte, sólo cuando se abre un documento. */
+:root{
+  --bg:#F6F3F9; --surface:#FFFFFF; --ink:#2A2230; --muted:#6B5F73; --line:#E6DEEA;
+  --accent:#74558C; --accent-ink:#FFFFFF; --accent-soft:#F1E8F6; --accent-line:#DAC6E6;
+  --warn:#8A5200; --warn-bg:#FFF3DC; --danger:#A3243B; --danger-bg:#FCE8EC;
+  --c-receta:#74558C; --t-receta:#F1E8F6;
+  --c-ind:#2C6E8C; --t-ind:#E4F1F6;
+  --c-cons:#3A7A4C; --t-cons:#E6F3E9;
+  --c-res:#B0502A; --t-res:#FBEBE3;
+  --c-def:#4B4F63; --t-def:#ECEDF2;
+  --f-display:Georgia,"Times New Roman",serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --r:14px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17121A; --surface:#211A25; --ink:#EEE7F1; --muted:#B3A6BA; --line:#382E3E;
+  --accent:#C7A6DE; --accent-ink:#1E1622; --accent-soft:#2E2338; --accent-line:#4E3B5C;
+  --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
+  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
+  --c-res:#F0A07C; --t-res:#3A2219; --c-def:#B9BDD3; --t-def:#26283A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17121A; --surface:#211A25; --ink:#EEE7F1; --muted:#B3A6BA; --line:#382E3E;
+  --accent:#C7A6DE; --accent-ink:#1E1622; --accent-soft:#2E2338; --accent-line:#4E3B5C;
+  --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
+  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
+  --c-res:#F0A07C; --t-res:#3A2219; --c-def:#B9BDD3; --t-def:#26283A; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+button{font:inherit;cursor:pointer;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:860px;margin:0 auto;padding:max(14px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 120px max(16px,env(safe-area-inset-left,0px))}
+a{color:var(--accent)}
+
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;background:#FFFFFF;color:#22182A;border:1px solid #E6DCEB;border-radius:18px;padding:14px 16px}
+.app{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#7A3E8E;font-weight:700;margin:0}
+.app .eyebrow a{color:inherit;text-decoration:none}
+.app h1{font-family:var(--f-display);font-weight:600;font-size:clamp(1.6rem,6vw,2.1rem);line-height:1.05;margin:0;color:#22182A}
+.app .tag{margin:2px 0 0;color:#5E5266;font-size:.9rem}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{width:62px;height:auto;flex:none;display:block}
+.brand .nm{font-family:var(--f-display);font-weight:600;font-size:1rem;margin:0;color:#22182A}
+.brand .ced{font-size:.76rem;color:#5E5266;margin:0}
+
+h2{font-family:var(--f-display);font-weight:600;font-size:1.25rem;margin:0}
+h3{font-size:1rem;margin:0 0 8px;color:var(--accent)}
+.sec{margin-top:18px}
+.sec-h{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.sec-h p{margin:0;color:var(--muted);font-size:.9rem}
+.sec-h h2 .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-family:var(--f-body);font-size:.9rem;font-weight:700;margin-right:8px;vertical-align:3px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-top:12px}
+.card > h3:first-child{margin-top:0}
+.card .hint{margin:-4px 0 10px;color:var(--muted);font-size:.86rem}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+.fields .w2{grid-column:1/-1}
+@media (min-width:700px){.fields{grid-template-columns:repeat(4,minmax(0,1fr))}.fields .w2{grid-column:span 2}.fields .w4{grid-column:1/-1}}
+.fields .w4{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:.86rem;font-weight:700;min-width:0}
+label.f .op{font-weight:400;color:var(--muted);font-size:.78rem}
+input[type=number],input[type=text],input[type=tel],input[type=date],input[type=time],select,textarea{font:inherit;font-weight:400;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-width:0;min-height:48px}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none}
+textarea{min-height:88px;resize:vertical;line-height:1.4}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--accent-line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font-size:.92rem;font-weight:600;min-height:42px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.mini{min-height:34px;padding:5px 11px;font-size:.82rem;font-weight:600}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg .chip{border-radius:12px;min-height:52px;font-size:1rem}
+.checks{display:flex;flex-direction:column;gap:2px}
+.checks label{display:flex;align-items:flex-start;gap:10px;font-size:.95rem;padding:7px 2px;line-height:1.35}
+.checks input{width:22px;height:22px;flex:none;accent-color:var(--accent);margin:0}
+.btn{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:12px;padding:10px 16px;font-weight:700;font-size:1rem;min-height:48px}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.sm{padding:6px 12px;min-height:40px;font-size:.88rem}
+.btn.add{width:100%;background:var(--accent-soft);color:var(--accent);border:1px dashed var(--accent-line);margin-top:10px}
+.btn.del{background:transparent;border:1px solid var(--line);color:var(--danger);font-size:.85rem;min-height:36px;padding:4px 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* tarjetas de medicamento */
+.item{border:1px solid var(--accent-line);border-radius:12px;padding:12px;margin-top:10px;background:var(--bg)}
+.item-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.item-h b{display:flex;align-items:center;gap:8px;font-size:.95rem}
+.item-h .no{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:.82rem}
+.item.resc{border-color:#E7B9A3;background:var(--t-res)}
+.item.resc .no{background:var(--c-res)}
+.warn{font-size:.84rem;background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:7px 10px;margin-top:8px}
+.warn:empty{display:none}
+.note{font-size:.84rem;color:var(--muted);margin:8px 0 0}
+
+/* inicio */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:12px}
+.tile{display:flex;gap:14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-height:84px;width:100%;text-decoration:none;color:inherit}
+.tile:hover{border-color:var(--c)}
+.tile .ic{flex:none;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:var(--t);color:var(--c)}
+.tile .ic svg{width:28px;height:28px}
+.tile .tx{flex:1;min-width:0}
+.tile .tt{display:block;font-weight:700;font-size:1.08rem;line-height:1.25}
+.tile .ds{display:block;color:var(--muted);font-size:.9rem;margin-top:3px;line-height:1.35}
+.tile .go{flex:none;color:var(--c);width:22px;height:22px}
+.ptsum{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.ptsum span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.92rem}
+.disc{margin:12px 0 0;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:12px;padding:9px 12px;font-size:.86rem}
+.disc b{color:var(--accent)}
+
+/* módulo */
+.bar{position:sticky;top:0;z-index:5;background:#FFFFFF;color:#22182A;border-bottom:1px solid #E6DCEB;padding-top:env(safe-area-inset-top,0px)}
+.bar-r{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;height:56px;padding:0 max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+.back{display:flex;align-items:center;gap:4px;background:transparent;border:1px solid #E6DCEB;border-radius:10px;height:40px;padding:0 10px;color:#5B3D72;font-weight:700;flex:none}
+.back svg{width:18px;height:18px}
+.bar .ttl{min-width:0;flex:1;display:flex;flex-direction:column;line-height:1.15}
+.bar .ttl b{font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .ttl small{font-size:.7rem;color:#7A3E8E;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+#modView .wrap{padding-top:6px}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock-r{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:4px}
+.dock .btn{width:100%;min-height:54px;font-size:1.05rem;display:flex;align-items:center;justify-content:center;gap:10px}
+.dock .btn svg{width:22px;height:22px}
+.dock .msg{font-size:.84rem;color:var(--muted);text-align:center;min-height:1em}
+.dock .msg.err{color:var(--danger)}
+.prev{white-space:pre-wrap;background:var(--accent-soft);border-radius:10px;padding:12px;font-size:.92rem;line-height:1.5;margin-top:4px}
+.prev b{color:var(--accent)}
+footer.own{margin-top:26px;border-top:1px solid var(--accent-line);padding-top:12px;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+footer.own b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<main id="homeView" class="wrap">
+  <header class="top">
+    <div class="app">
+      <p class="eyebrow"><a href="../">‹ KAIRÓS</a> · Documentos médicos</p>
+      <h1>Recetas y documentos</h1>
+      <p class="tag">Llene los cuadros y obtenga el PDF con el membrete de la Dra. Gaby.</p>
+    </div>
+    <div class="brand">
+      <img src="logo.jpg" width="62" height="50" alt="Logotipo Dra. Gabriela López Ortiz">
+      <div>
+        <p class="nm">Dra. Gabriela Alejandra López Ortiz</p>
+        <p class="ced">Céd. Prof. 6383462 · Céd. Esp. 12184347</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="sec" aria-labelledby="ptH">
+    <div class="sec-h"><h2 id="ptH"><span class="n">1</span>Datos del paciente</h2><p>Se escriben una vez y pasan solos a todos los documentos.</p></div>
+    <div id="ptHome"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="mnH">
+    <div class="sec-h"><h2 id="mnH"><span class="n">2</span>¿Qué documento necesita?</h2><p>Toque una opción, llene lo que aplique y toque «Generar PDF».</p></div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <footer class="own">
+    <span><b>© 2026 Dra. Gabriela Alejandra López Ortiz.</b> Herramienta de su propiedad, para uso exclusivo médico.</span>
+    <span>No envía datos a internet. Lo escrito se borra al cerrar la pestaña o con «Nuevo paciente».</span>
+  </footer>
+</main>
+
+<div id="modView" hidden>
+  <div class="bar"><div class="bar-r">
+    <button type="button" class="back" data-act="home" aria-label="Volver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Inicio</button>
+    <div class="ttl"><small>Documentos médicos</small><b id="modTitle"></b></div>
+  </div></div>
+  <main class="wrap" id="modBody"></main>
+  <div class="dock"><div class="dock-r">
+    <button type="button" class="btn" id="pdfBtn" data-act="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6M9 15l3 3 3-3"/></svg><span id="pdfTxt">Generar PDF</span></button>
+    <div class="msg" id="pdfMsg" aria-live="polite"></div>
+  </div></div>
+</div>
+
+<datalist id="dlMed"></datalist>
+<datalist id="dlPara"><option>dolor</option><option>dolor neuropático (ardor, piquetes)</option><option>náusea o vómito</option><option>estreñimiento</option><option>diarrea</option><option>falta de aire</option><option>tos</option><option>ansiedad</option><option>insomnio</option><option>agitación o confusión</option><option>secreciones</option><option>falta de apetito</option><option>proteger el estómago</option><option>inflamación</option><option>comezón</option><option>tristeza o ánimo bajo</option><option>convulsiones</option><option>fiebre</option></datalist>
+<datalist id="dlDur"><option>3 días</option><option>5 días</option><option>7 días</option><option>10 días</option><option>14 días</option><option>1 mes</option><option>hasta nueva indicación</option><option>uso continuo</option></datalist>
+<datalist id="dlSint"><option>dolor</option><option>dolor intenso de inicio súbito</option><option>falta de aire</option><option>náusea o vómito</option><option>agitación o inquietud</option><option>ansiedad o angustia</option><option>secreciones (ruido al respirar)</option><option>convulsiones</option><option>insomnio</option><option>fiebre</option></datalist>
+<datalist id="dlInt"><option>15 minutos</option><option>30 minutos</option><option>1 hora</option><option>2 horas</option><option>4 horas</option><option>6 horas</option><option>8 horas</option></datalist>
+<datalist id="dlSol"><option>Solución salina 0.9 %</option><option>Solución Hartmann</option><option>Solución glucosada 5 %</option><option>Solución glucosada 10 %</option><option>Solución mixta (glucosalina)</option><option>Solución glucosada 5 % + cloruro de sodio</option></datalist>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){ return document.getElementById(id); };
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function low1(s){ s=String(s||''); return s.charAt(0).toLowerCase()+s.slice(1); }
+function up1(s){ s=String(s||'').trim(); return s.charAt(0).toUpperCase()+s.slice(1); }
+function trim(s){ return String(s==null?'':s).trim(); }
+
+/* ---------- catálogos ---------- */
+var MEDS={
+ 'Paracetamol':'tabletas de 500 mg','Metamizol':'tabletas de 500 mg','Ketorolaco':'tabletas de 10 mg','Ibuprofeno':'tabletas de 400 mg','Naproxeno':'tabletas de 250 mg','Celecoxib':'cápsulas de 100 mg',
+ 'Tramadol':'gotas 100 mg/mL','Tramadol/paracetamol':'tabletas de 37.5/325 mg','Buprenorfina':'parche de 35 µg/h','Tapentadol':'tabletas de liberación prolongada de 50 mg',
+ 'Morfina':'solución inyectable 10 mg/mL','Morfina de liberación prolongada':'tabletas de 30 mg','Oxicodona':'tabletas de liberación prolongada de 10 mg','Hidromorfona':'tabletas de 2 mg','Fentanilo':'parche de 25 µg/h','Metadona':'tabletas de 5 mg',
+ 'Gabapentina':'cápsulas de 300 mg','Pregabalina':'cápsulas de 75 mg','Duloxetina':'cápsulas de 30 mg','Amitriptilina':'tabletas de 25 mg','Lidocaína':'parche al 5 %',
+ 'Dexametasona':'tabletas de 4 mg','Prednisona':'tabletas de 5 mg','Ondansetrón':'tabletas de 8 mg','Metoclopramida':'tabletas de 10 mg','Haloperidol':'gotas 2 mg/mL','Levomepromazina':'tabletas de 25 mg',
+ 'Midazolam':'solución inyectable 15 mg/3 mL','Lorazepam':'tabletas de 1 mg','Clonazepam':'gotas 2.5 mg/mL','Alprazolam':'tabletas de 0.25 mg','Quetiapina':'tabletas de 25 mg','Mirtazapina':'tabletas de 15 mg','Sertralina':'tabletas de 50 mg',
+ 'Senósidos A-B':'tabletas de 8.6 mg','Polietilenglicol 3350':'sobres de 17 g','Lactulosa':'jarabe 3.3 g/5 mL','Bisacodilo':'tabletas de 5 mg','Loperamida':'tabletas de 2 mg',
+ 'Omeprazol':'cápsulas de 20 mg','Butilhioscina':'solución inyectable 20 mg/mL','Furosemida':'tabletas de 40 mg','Espironolactona':'tabletas de 25 mg','Megestrol':'suspensión 40 mg/mL','Salbutamol':'aerosol 100 µg/dosis','Saliva artificial':'solución oral'
+};
+var CONTROL=/morfin|oxicodon|fentanil|metadon|hidromorfon|tapentadol|buprenorfin|petidin/i;
+var PSICO=/midazolam|lorazepam|clonazepam|alprazolam|diazepam|zolpidem|fenobarbital/i;
+var VIAS=['por boca (vía oral)','debajo de la lengua (sublingual)','subcutánea','intravenosa','intramuscular','parche en la piel (transdérmica)','en la piel (tópica)','por el recto','inhalada / nebulizada','por la sonda de alimentación','en los ojos','otra'];
+var FREC=['cada 4 horas','cada 6 horas','cada 8 horas','cada 12 horas','cada 24 horas (una vez al día)','cada 72 horas (cambiar parche)','en la mañana','en la noche, al acostarse','antes de cada comida','en infusión continua (bomba)','dosis única','otra'];
+var DIETAS=['Ayuno','Líquidos claros','Dieta líquida completa','Dieta blanda','Dieta en papilla / licuada','Dieta normal a tolerancia','Dieta de confort (lo que desee y tolere)','Dieta para diabético','Dieta baja en sal','Alimentación por sonda','Otra'];
+var GEN={
+ dom:['Vigilar el estado de alerta, la respiración y el dolor varias veces al día','Anotar diario los síntomas y los rescates que se usaron (registro de síntomas)','Cambios de posición cada 2 horas si pasa la mayor parte del tiempo en cama','Cabecera elevada a 30-45 grados','Vigilar evacuaciones: avisar si pasan 3 días sin evacuar','Vigilar que orine; avisar si pasan 12 horas sin orinar','Cuidar el sitio de la mariposa subcutánea; cambiarla si se enrojece o duele','Prevenir caídas: acompañarlo al levantarse y al ir al baño','Dar los medicamentos a la misma hora todos los días'],
+ hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno','Reportar eventualidades']
+};
+var CONF=['Cuidado de la boca: humedecer labios y boca con gasa o esponja húmeda varias veces al día','Hidratar la piel con crema y proteger talones, cadera y espalda','Colchón de aire o de presión alterna','Ambiente tranquilo, luz tenue y poco ruido','Acompañamiento de la familia; permitir visitas','Ofrecer líquidos a sorbos sin forzar','Aseo y cambio de pañal frecuentes','Lubricante o gotas en los ojos si no los cierra','Música, oración o lo que le dé tranquilidad','Acompañamiento espiritual según sus creencias','Evitar estudios, piquetes y procedimientos que no le den bienestar'];
+var ALARMA={
+ dom:['Dolor que no se quita después de 2 rescates','Falta de aire intensa o respiración muy agitada','Agitación, confusión o alucinaciones','Convulsiones','Vómito que no se controla','Sangrado','No orina en más de 12 horas','Caída o golpe','Si el paciente fallece, para orientarles'],
+ hosp:['Dolor mayor de 4/10 después del rescate','Saturación menor de 90 %','Presión arterial sistólica menor de 90 mmHg','Agitación o delirium','Sangrado','Uresis menor de 0.5 mL/kg/h']
+};
+var ESTADO=[['avanzada','cursa con una enfermedad avanzada, progresiva e incurable','has an advanced, progressive and incurable illness'],
+ ['final','se encuentra en la etapa final de la vida','is in the final stage of life'],
+ ['pron','tiene un pronóstico de vida limitado','has a limited life expectancy'],
+ ['depend','depende de otra persona para sus actividades básicas diarias','depends on others for basic daily activities'],
+ ['cuid','requiere cuidados y supervisión continua en su domicilio','requires continuous care and supervision at home']];
+var PARENT={'hija':'daughter','hijo':'son','esposa':'wife','esposo':'husband','hermana':'sister','hermano':'brother','madre':'mother','padre':'father','nieta':'granddaughter','nieto':'grandson','sobrina':'niece','sobrino':'nephew','nuera':'daughter-in-law','yerno':'son-in-law','pareja':'partner','familiar':'relative'};
+var SIGNOS=['ausencia de pulso central','ausencia de ruidos cardiacos a la auscultación','ausencia de movimientos respiratorios','pupilas dilatadas, fijas y sin respuesta a la luz','ausencia de respuesta a estímulos'];
+var PARA_CONS=[['fam_trab','Familiar: para su trabajo'],['fam_viaje','Familiar: viene de otro país'],['pac','Para el paciente'],['otro','Otro motivo']];
+var MOTIVO_RES=['Envío a su médico tratante','Interconsulta / segunda opinión','Trámite o aseguradora','Para el paciente y su familia'];
+
+var ICON={
+ receta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7a4 4 0 0 1 0 8H6zM6 11v10M10 11l8 10M18 13l-6 8"/></svg>',
+ ind:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>',
+ cons:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><circle cx="12" cy="14" r="2.5"/><path d="M10.5 16.2 10 20l2-1 2 1-.5-3.8"/></svg>',
+ res:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
+ def:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-3-7-6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 10z"/><path d="M12 8v8"/></svg>'
+};
+var MODS=[
+ {id:'receta',t:'Receta médica',d:'Medicamentos en formato fácil: dosis, para qué es, cómo y cuánto tiempo. Con rescates.',hdr:'RECETA MÉDICA',arch:'Receta'},
+ {id:'ind',t:'Indicaciones médicas',d:'Domicilio u hospital: dieta, soluciones, medicamentos, rescates, medidas generales y de confort.',hdr:'INDICACIONES MÉDICAS',arch:'Indicaciones'},
+ {id:'cons',t:'Constancia médica',d:'Para el familiar que trabaja o viene de otro país, o para el paciente.',hdr:'CONSTANCIA MÉDICA',arch:'Constancia'},
+ {id:'res',t:'Resumen médico',d:'Resumen breve para su médico tratante o para lo que el paciente necesite.',hdr:'RESUMEN MÉDICO',arch:'Resumen'},
+ {id:'def',t:'Parte médico de defunción',d:'Fallecimiento en domicilio: causa y constatación, para mostrar a autoridades o funeraria.',hdr:'PARTE MÉDICO',arch:'Parte_medico'}
+];
+function mod(id){ for(var i=0;i<MODS.length;i++) if(MODS[i].id===id) return MODS[i]; }
+
+/* ---------- estado ---------- */
+function hoyISO(){ var d=new Date(), p=function(n){ return (n<10?'0':'')+n; }; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function ahora(){ var d=new Date(), p=function(n){ return (n<10?'0':'')+n; }; return p(d.getHours())+':'+p(d.getMinutes()); }
+function nuevoMed(){ return {nom:'',pres:'',dosis:'',via:'',viaO:'',frec:'',frecO:'',dur:'',para:'',extra:'',cant:''}; }
+function nuevoResc(){ return {sint:'',nom:'',dosis:'',via:'',viaO:'',int:'',max:'',nota:''}; }
+function base(){
+  var f=hoyISO();
+  return {
+    pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
+    receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),cuid:'',tel:'',hosp:'',cama:'',exp:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
+    cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
+    res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
+    def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
+  };
+}
+var S;
+function ss(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); if(v===null) sessionStorage.removeItem(k); else sessionStorage.setItem(k,v); }catch(e){ return null; } }
+function cargar(){
+  var b=base(), s=null; try{ s=JSON.parse(ss('docs_state')||'null'); }catch(e){}
+  if(s&&typeof s==='object'){ Object.keys(b).forEach(function(k){ if(s[k]&&typeof s[k]==='object') Object.keys(b[k]).forEach(function(j){ if(s[k][j]!==undefined) b[k][j]=s[k][j]; }); }); }
+  else{
+    /* si viene de KAIRÓS en la misma pestaña, toma los datos del paciente */
+    try{ var r=JSON.parse(ss('kairos_reg')||'null'); if(r){ b.pt.nombre=r.nombre||''; b.pt.edad=r.edad||''; b.pt.sexo=r.sexo||''; b.pt.peso=r.peso||''; b.pt.talla=r.talla||''; b.pt.dx=r.dxtxt||''; } }catch(e){}
+  }
+  S=b;
+}
+var tGuardar=null;
+function guardar(){ clearTimeout(tGuardar); tGuardar=setTimeout(function(){ ss('docs_state',JSON.stringify(S)); },250); }
+function getP(p){ var o=S, k=p.split('.'); for(var i=0;i<k.length;i++){ if(o==null) return ''; o=o[k[i]]; } return o==null?'':o; }
+function setP(p,v){ var o=S, k=p.split('.'); for(var i=0;i<k.length-1;i++) o=o[k[i]]; o[k[k.length-1]]=v; guardar(); }
+
+/* ---------- componentes ---------- */
+function fT(p,lab,o){ o=o||{}; var v=getP(p);
+  return '<label class="f'+(o.c?' '+o.c:'')+'">'+lab+(o.op?' <span class="op">('+o.op+')</span>':'')+
+    '<input type="'+(o.type||'text')+'" data-k="'+p+'" value="'+esc(v)+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+(o.list?' list="'+o.list+'"':'')+(o.im?' inputmode="'+o.im+'"':'')+' autocomplete="off"></label>'; }
+function fA(p,lab,o){ o=o||{};
+  return '<label class="f'+(o.c?' '+o.c:' w4')+'">'+lab+(o.op?' <span class="op">('+o.op+')</span>':'')+
+    '<textarea data-k="'+p+'" rows="'+(o.rows||3)+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+'>'+esc(getP(p))+'</textarea></label>'; }
+function fS(p,lab,opts,o){ o=o||{}; var v=getP(p);
+  return '<label class="f'+(o.c?' '+o.c:'')+'">'+lab+'<select data-k="'+p+'"'+(o.re?' data-re="1"':'')+'><option value="">—</option>'+
+    opts.map(function(x){ var val=Array.isArray(x)?x[0]:x, t=Array.isArray(x)?x[1]:x; return '<option value="'+esc(val)+'"'+(val===v?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'</select></label>'; }
+function chips(p,opts,cls){ var v=getP(p);
+  return '<div class="chips'+(cls?' '+cls:'')+'">'+opts.map(function(x){ var val=Array.isArray(x)?x[0]:x, t=Array.isArray(x)?x[1]:x;
+    return '<button type="button" class="chip" data-act="set" data-k="'+p+'" data-v="'+esc(val)+'" aria-pressed="'+(v===val)+'">'+esc(t)+'</button>'; }).join('')+'</div>'; }
+function fill(p,opts){ return '<div class="chips" style="margin-top:6px">'+opts.map(function(t){ return '<button type="button" class="chip mini" data-act="fill" data-k="'+p+'" data-v="'+esc(t)+'">'+esc(t)+'</button>'; }).join('')+'</div>'; }
+function checks(p,opts){ var v=getP(p)||[];
+  return '<div class="checks">'+opts.map(function(x){ var val=Array.isArray(x)?x[0]:x, t=Array.isArray(x)?x[1]:x;
+    return '<label><input type="checkbox" data-k="'+p+'" data-v="'+esc(val)+'"'+(v.indexOf(val)>=0?' checked':'')+'><span>'+esc(t)+'</span></label>'; }).join('')+'</div>'; }
+
+function ptCard(compacto){
+  var p=S.pt;
+  var campos='<div class="fields">'+fT('pt.nombre','Nombre completo',{c:'w2'})+fT('pt.edad','Edad (años)',{type:'number',im:'numeric'})+
+    fS('pt.sexo','Sexo',[['F','Mujer'],['M','Hombre']])+fT('pt.peso','Peso (kg)',{type:'number',im:'decimal',op:'si aplica'})+fT('pt.talla','Talla (cm)',{type:'number',im:'decimal',op:'si aplica'})+
+    fT('pt.dx','Diagnóstico principal',{c:'w2',ph:'p. ej. cáncer de páncreas etapa IV'})+fT('pt.alergias','Alergias',{c:'w2',ph:'p. ej. penicilina'})+'</div>'+
+    '<div class="chips" style="margin-top:8px"><button type="button" class="chip mini" data-act="fill" data-k="pt.alergias" data-v="Negadas">Alergias negadas</button></div>';
+  if(!compacto) return '<div class="card">'+campos+'<div class="row" style="margin-top:12px"><button type="button" class="btn ghost sm" data-act="nuevo">Nuevo paciente</button></div></div>';
+  var res=[p.nombre||'Sin nombre', p.edad?p.edad+' años':'', p.sexo==='F'?'mujer':p.sexo==='M'?'hombre':''].filter(Boolean).join(' · ');
+  return '<details class="card" id="ptDet"'+(p.nombre?'':' open')+'><summary class="ptsum" style="list-style:none;cursor:pointer"><span><b>Paciente:</b> '+esc(res)+'</span><span class="btn ghost sm" style="flex:none">Editar</span></summary><div style="margin-top:12px">'+campos+'</div></details>';
+}
+
+function medCard(base,i,o){
+  var m=getP(base+'.'+i), p=base+'.'+i;
+  var h='<div class="item"><div class="item-h"><b><span class="no">'+(i+1)+'</span>Medicamento</b><button type="button" class="btn del" data-act="del" data-k="'+base+'" data-i="'+i+'">Quitar</button></div><div class="fields">'+
+    fT(p+'.nom','Medicamento (nombre genérico)',{c:'w2',list:'dlMed',ph:'p. ej. Paracetamol'})+
+    fT(p+'.pres','Presentación y concentración',{c:'w2',ph:'p. ej. tabletas de 500 mg'})+
+    fT(p+'.dosis','Dosis (cuánto)',{c:'w2',ph:'p. ej. 1 tableta'})+
+    fS(p+'.via','Cómo se aplica',VIAS,{re:1,c:'w2'})+
+    (m.via==='otra'?fT(p+'.viaO','Escriba la vía',{}):'')+
+    fS(p+'.frec','Cada cuánto',FREC,{re:1,c:'w2'})+
+    (m.frec==='otra'?fT(p+'.frecO','Escriba cada cuánto',{ph:'p. ej. 8:00, 14:00 y 20:00'}):'')+
+    fT(p+'.dur','Cuánto tiempo',{c:'w2',list:'dlDur',ph:'p. ej. 7 días'})+
+    fT(p+'.para','Para qué es',{c:'w2',list:'dlPara',ph:'p. ej. dolor'})+
+    fT(p+'.extra','Indicaciones extra',{c:'w2',op:'opcional',ph:'p. ej. con alimentos; no masticar'})+
+    (o.cant?fT(p+'.cant','Cantidad a surtir',{c:'w2',op:'opcional',ph:'p. ej. 1 caja con 20 tabletas'}):'')+
+    '</div><div class="warn" id="w_'+p.replace(/\./g,'_')+'">'+esc(avisoMed(m.nom))+'</div></div>';
+  return h;
+}
+function rescCard(base,i){
+  var p=base+'.'+i, r=getP(p);
+  return '<div class="item resc"><div class="item-h"><b><span class="no">R'+(i+1)+'</span>Rescate</b><button type="button" class="btn del" data-act="del" data-k="'+base+'" data-i="'+i+'">Quitar</button></div><div class="fields">'+
+    fT(p+'.sint','Si presenta…',{c:'w2',list:'dlSint',ph:'p. ej. dolor'})+
+    fT(p+'.nom','Dar (medicamento)',{c:'w2',list:'dlMed',ph:'p. ej. Morfina'})+
+    fT(p+'.dosis','Dosis',{ph:'p. ej. 2.5 mg'})+
+    fS(p+'.via','Cómo se aplica',VIAS,{re:1,c:'w2'})+
+    (r.via==='otra'?fT(p+'.viaO','Escriba la vía',{}):'')+
+    fT(p+'.int','Puede repetir cada',{list:'dlInt',ph:'p. ej. 1 hora'})+
+    fT(p+'.max','Máximo al día',{op:'opcional',ph:'p. ej. 6 dosis'})+
+    fT(p+'.nota','Nota',{c:'w4',op:'opcional',ph:'p. ej. si no mejora con 2 dosis, llamar a la doctora'})+
+    '</div><div class="warn" id="w_'+p.replace(/\./g,'_')+'">'+esc(avisoMed(r.nom))+'</div></div>';
+}
+function avisoMed(n){
+  if(CONTROL.test(n||'')) return 'Opioide controlado: en farmacia se surte con la receta especial con código de barras de COFEPRIS. Este PDF sirve como guía para la familia.';
+  if(PSICO.test(n||'')) return 'Psicotrópico: la farmacia retiene la receta. Imprima dos ejemplares.';
+  return '';
+}
+
+/* ---------- vistas de cada documento ---------- */
+var VIEW={};
+VIEW.receta=function(){ var r=S.receta;
+  return ptCard(true)+
+  '<div class="card"><h3>Fecha</h3><div class="fields">'+fT('receta.fecha','Fecha de la receta',{type:'date'})+'</div></div>'+
+  '<div class="card"><h3>Medicamentos</h3><p class="hint">Uno por tarjeta. Agregue los que necesite.</p>'+
+    r.meds.map(function(m,i){ return medCard('receta.meds',i,{cant:1}); }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="receta.meds">+ Agregar medicamento</button></div>'+
+  '<div class="card"><h3>Rescates</h3><p class="hint">Dosis extra para cuando aparece un síntoma. Agregue todos los que necesite.</p>'+
+    r.resc.map(function(m,i){ return rescCard('receta.resc',i); }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="receta.resc">+ Agregar rescate</button></div>'+
+  '<div class="card"><h3>Recomendaciones</h3><div class="fields">'+fA('receta.recom','Recomendaciones generales',{op:'opcional',rows:3})+fT('receta.cita','Próxima cita',{c:'w2',op:'opcional',ph:'p. ej. en 15 días o lunes 3 de noviembre'})+'</div></div>';
+};
+VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
+  var h='<div class="card"><h3>¿Dónde está el paciente?</h3>'+chips('ind.amb',[['dom','En su domicilio'],['hosp','Hospitalizado']],'seg')+'</div>'+ptCard(true)+
+  '<div class="card"><h3>Datos de la hoja</h3><div class="fields">'+fT('ind.fecha','Fecha',{type:'date'})+fT('ind.hora','Hora',{type:'time'})+
+    (dom?fT('ind.cuid','Cuidador principal',{c:'w2',op:'opcional'})+fT('ind.tel','Teléfono del cuidador',{type:'tel',im:'tel',op:'opcional'})
+        :fT('ind.hosp','Hospital y servicio',{c:'w2',op:'opcional'})+fT('ind.cama','Cama',{op:'opcional'})+fT('ind.exp','Expediente',{op:'opcional'}))+'</div></div>'+
+  '<div class="card"><h3>1. Dieta</h3><p class="hint">Toque una opción.</p>'+chips('ind.dieta',DIETAS)+(d.dieta==='Otra'?'<div class="fields" style="margin-top:10px">'+fT('ind.dietaO','Escriba la dieta',{c:'w4'})+'</div>':'')+'</div>'+
+  '<div class="card"><h3>2. Soluciones</h3><p class="hint">'+(d.sol.length?'':'Si no lleva soluciones, déjelo así: en el PDF dirá «Sin soluciones».')+'</p>'+
+    d.sol.map(function(s,i){ var p='ind.sol.'+i; return '<div class="item"><div class="item-h"><b><span class="no">'+(i+1)+'</span>Solución</b><button type="button" class="btn del" data-act="del" data-k="ind.sol" data-i="'+i+'">Quitar</button></div><div class="fields">'+
+      fT(p+'.tipo','Solución',{c:'w2',list:'dlSol',ph:'p. ej. Solución salina 0.9 %'})+fT(p+'.vol','Volumen',{ph:'p. ej. 1000 mL'})+
+      fS(p+'.via','Vía',['intravenosa','subcutánea (hipodermoclisis)'])+fT(p+'.tiempo','Para pasar en',{ph:'p. ej. 24 horas'})+fT(p+'.extra','Agregar / nota',{op:'opcional',ph:'p. ej. + 20 mEq KCl'})+'</div></div>'; }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="ind.sol">+ Agregar solución</button></div>'+
+  '<div class="card"><h3>3. Medicamentos</h3>'+d.meds.map(function(m,i){ return medCard('ind.meds',i,{}); }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="ind.meds">+ Agregar medicamento</button></div>'+
+  '<div class="card"><h3>4. Medicamentos de rescate</h3>'+d.resc.map(function(m,i){ return rescCard('ind.resc',i); }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="ind.resc">+ Agregar rescate</button></div>'+
+  '<div class="card"><h3>5. Medidas generales</h3>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>6. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>7. '+(dom?'Llamar a la doctora si…':'Avisar al médico si…')+'</h3>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
+  (dom?'':'<div class="card"><h3>8. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
+  '<div class="card"><h3>'+(dom?'8':'9')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
+  return h;
+};
+VIEW.cons=function(){ var c=S.cons, fam=c.para.indexOf('fam')===0;
+  return '<div class="card"><h3>¿Para quién es la constancia?</h3>'+chips('cons.para',PARA_CONS)+'</div>'+ptCard(true)+
+  '<div class="card"><h3>Datos de la constancia</h3><div class="fields">'+fT('cons.dest','Dirigida a',{c:'w2'})+fT('cons.fecha','Fecha',{type:'date'})+fT('cons.lugar','Lugar',{})+
+    fT('cons.desde','En atención por la Dra. desde',{type:'date',op:'opcional'})+
+    '<label class="f w2" style="flex-direction:row;align-items:center;gap:10px;font-weight:600"><input type="checkbox" data-k="cons.inclDx" data-b="1"'+(c.inclDx?' checked':'')+' style="width:22px;height:22px;accent-color:var(--accent)"> Incluir el diagnóstico en el texto</label></div></div>'+
+  '<div class="card"><h3>Estado del paciente</h3><p class="hint">Marque lo que aplica.</p>'+checks('cons.estado',ESTADO.map(function(e){ return [e[0],up1(e[1])]; }))+'</div>'+
+  (fam?'<div class="card"><h3>Familiar</h3><div class="fields">'+fT('cons.fam','Nombre completo del familiar',{c:'w2'})+fS('cons.parent','Parentesco',Object.keys(PARENT))+
+     (c.para==='fam_viaje'?fT('cons.pais','País donde vive',{ph:'p. ej. Estados Unidos'}):'')+'</div></div>':'')+
+  '<div class="card"><h3>Periodo</h3><div class="fields">'+fT('cons.inicio','A partir del',{type:'date'})+fT('cons.periodo','Por cuánto tiempo',{ph:'p. ej. 30 días'})+'</div>'+
+     fill('cons.periodo',['7 días','15 días','30 días','tiempo indefinido, mientras dure su enfermedad'])+'</div>'+
+  '<div class="card"><h3>Texto adicional</h3><div class="fields">'+fA('cons.extra','Algo más que deba decir',{op:'opcional',rows:2})+'</div>'+
+    '<label class="f" style="flex-direction:row;align-items:center;gap:10px;font-weight:600;margin-top:10px"><input type="checkbox" data-k="cons.ingles" data-b="1" data-re="1"'+(c.ingles?' checked':'')+' style="width:22px;height:22px;accent-color:var(--accent)"> Agregar versión en inglés (para trámites en el extranjero)</label>'+
+    (c.ingles?'<div class="fields" style="margin-top:8px">'+fT('cons.dxEn','Diagnóstico en inglés',{c:'w4',op:'si se incluye',ph:'p. ej. stage IV pancreatic cancer'})+'</div>':'')+'</div>'+
+  textoCard('cons');
+};
+VIEW.res=function(){
+  return ptCard(true)+
+  '<div class="card"><h3>Datos del resumen</h3><div class="fields">'+fT('res.dest','Dirigido a',{c:'w2',op:'opcional',ph:'p. ej. Dr. Juan Pérez, Oncología'})+fT('res.fecha','Fecha',{type:'date'})+fT('res.lugar','Lugar',{})+'</div>'+
+    '<p class="hint" style="margin:12px 0 6px">Motivo</p>'+chips('res.motivo',MOTIVO_RES)+'</div>'+
+  '<div class="card"><h3>Contenido</h3><p class="hint">Breve. Lo que deje vacío no aparece en el PDF.</p><div class="fields">'+
+    fA('res.dxs','Diagnósticos',{ph:'Uno por renglón',rows:3})+
+    fA('res.ant','Antecedentes de importancia',{op:'opcional',rows:2})+
+    fA('res.evol','Resumen clínico y evolución',{rows:5})+
+    fA('res.estado','Estado actual',{ph:'p. ej. ECOG 3, PPS 40 %, dolor controlado 2/10, tolera vía oral',rows:3})+
+    fA('res.estudios','Estudios relevantes',{op:'opcional',rows:2})+
+    fA('res.tx','Tratamiento actual',{ph:'Un medicamento por renglón',rows:4})+
+    fA('res.plan','Plan y recomendaciones',{rows:3})+
+    fT('res.pron','Pronóstico',{c:'w4',op:'opcional',ph:'p. ej. reservado a corto plazo'})+'</div>'+
+    (S.receta.meds.some(function(m){ return trim(m.nom); })?'<button type="button" class="btn ghost sm" data-act="txReceta" style="margin-top:10px">Copiar el tratamiento de la receta</button>':'')+'</div>';
+};
+VIEW.def=function(){ var d=S.def;
+  return ptCard(true)+
+  '<div class="card"><h3>Fallecimiento</h3><div class="fields">'+fT('def.ffall','Fecha del fallecimiento',{type:'date'})+fT('def.hfall','Hora aproximada',{type:'time'})+
+    fT('def.dom','Domicilio donde ocurrió',{c:'w4',ph:'calle, número, colonia, municipio'})+
+    fT('def.fconst','Fecha en que la Dra. lo constató',{type:'date'})+fT('def.hconst','Hora',{type:'time'})+
+    fT('def.desde','En cuidados paliativos desde',{type:'date',op:'opcional'})+'</div></div>'+
+  '<div class="card"><h3>Causas de la defunción</h3><p class="hint">Como en el certificado: de la causa directa a la causa básica, con el tiempo aproximado.</p><div class="fields">'+
+    fT('def.ca','a) Causa directa',{c:'w2',ph:'p. ej. insuficiencia respiratoria'})+fT('def.ta','Tiempo',{ph:'p. ej. 2 días'})+'<span></span>'+
+    fT('def.cb','b) Debida a',{c:'w2',op:'opcional',ph:'p. ej. metástasis pulmonares'})+fT('def.tb','Tiempo',{})+'<span></span>'+
+    fT('def.cc','c) Debida a',{c:'w2',op:'opcional'})+fT('def.tc','Tiempo',{})+'<span></span>'+
+    fT('def.cbas','Causa básica (enfermedad de base)',{c:'w2',ph:'p. ej. cáncer de páncreas etapa IV'})+fT('def.tbas','Tiempo',{ph:'p. ej. 1 año'})+'<span></span>'+
+    fA('def.otros','Otras enfermedades que contribuyeron',{op:'opcional',rows:2})+'</div>'+
+    (trim(S.pt.dx)&&!trim(d.cbas)?'<button type="button" class="btn ghost sm" data-act="fill" data-k="def.cbas" data-v="'+esc(S.pt.dx)+'" style="margin-top:10px">Usar el diagnóstico del paciente como causa básica</button>':'')+'</div>'+
+  '<div class="card"><h3>Constatación</h3><p class="hint">Signos de muerte que se verificaron.</p>'+checks('def.signos',SIGNOS.map(function(s){ return [s,up1(s)]; }))+
+    '<label class="f" style="flex-direction:row;align-items:center;gap:10px;font-weight:600;margin-top:8px"><input type="checkbox" data-k="def.viol" data-b="1"'+(d.viol?' checked':'')+' style="width:22px;height:22px;accent-color:var(--accent)"> Sin huellas de violencia a la exploración externa</label></div>'+
+  '<div class="card"><h3>Quién informa</h3><div class="fields">'+fT('def.inf','Familiar que informa',{c:'w2',op:'opcional'})+fS('def.infpar','Parentesco',Object.keys(PARENT))+
+    fT('def.folio','Folio del certificado de defunción',{op:'si ya se expidió'})+fT('def.fecha','Fecha del documento',{type:'date'})+fT('def.lugar','Lugar',{})+'</div></div>'+
+  textoCard('def');
+};
+function textoCard(m){ var o=S[m];
+  if(o.edit) return '<div class="card"><h3>Texto del documento</h3><p class="hint">Está editando el texto a mano. Los cambios en los cuadros de arriba ya no lo modifican.</p><div class="fields">'+
+    fA(m+'.texto','Texto',{rows:12})+(m==='cons'&&o.ingles?fA(m+'.textoEn','Texto en inglés',{rows:10}):'')+'</div>'+
+    '<button type="button" class="btn ghost sm" data-act="regen" data-k="'+m+'" style="margin-top:10px">Volver al texto automático</button></div>';
+  return '<div class="card"><h3>Así quedará el texto</h3><div class="prev" id="prev"></div><button type="button" class="btn ghost sm" data-act="editar" data-k="'+m+'" style="margin-top:10px">Editar el texto a mano</button></div>';
+}
+
+/* ---------- textos automáticos ---------- */
+var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function fISO(s){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?{y:+m[1],m:+m[2],d:+m[3]}:null; }
+function fCorta(s){ var f=fISO(s); if(!f) return ''; var p=function(n){ return (n<10?'0':'')+n; }; return p(f.d)+'/'+p(f.m)+'/'+f.y; }
+function fLarga(s){ var f=fISO(s); return f?f.d+' de '+MESES[f.m-1]+' de '+f.y:''; }
+function fLargaEn(s){ var f=fISO(s); return f?MONTHS[f.m-1]+' '+f.d+', '+f.y:''; }
+function lista(a,y){ a=a.filter(Boolean); y=y||'y'; if(a.length<2) return a.join(''); return a.slice(0,-1).join(', ')+' '+y+' '+a[a.length-1]; }
+var DRA='La que suscribe, Dra. Gabriela Alejandra López Ortiz, médica especialista en Anestesiología y en Medicina Paliativa y del Dolor, con cédula profesional 6383462 y cédula de especialidad 12184347,';
+function elPac(cap){ var s=S.pt.sexo, t=s==='F'?'la paciente':s==='M'?'el paciente':'el (la) paciente'; return cap?up1(t):t; }
+
+function textoCons(){
+  var c=S.cons, p=S.pt, L=[];
+  L.push(DRA+' HACE CONSTAR que:');
+  var a=elPac(true)+' '+(trim(p.nombre)||'__________')+(p.edad?', de '+p.edad+' años de edad,':'')+' se encuentra bajo mi atención médica en cuidados paliativos'+(c.desde?' desde el '+fLarga(c.desde):'')+
+    (c.inclDx&&trim(p.dx)?', con diagnóstico de '+low1(trim(p.dx)):'')+'.';
+  var est=ESTADO.filter(function(e){ return c.estado.indexOf(e[0])>=0; }).map(function(e){ return e[1]; });
+  if(est.length) a+=' Actualmente '+lista(est)+'.';
+  L.push(a);
+  var per=(c.inicio?' a partir del '+fLarga(c.inicio):'')+(trim(c.periodo)?(/^tiempo/.test(c.periodo)?' y por '+c.periodo:' y por un periodo de '+trim(c.periodo)):'');
+  var fam=(c.parent?'su '+c.parent+' ':'')+(trim(c.fam)||(c.parent?'':'un familiar cercano'));
+  if(c.para==='fam_trab') L.push('Por su estado de salud, es necesario que '+fam+' permanezca a su lado para brindarle cuidados y acompañamiento'+per+', por lo que atentamente solicito se le otorguen las facilidades necesarias en su centro de trabajo.');
+  else if(c.para==='fam_viaje') L.push('Por su estado de salud, es importante que '+fam+(trim(c.pais)?', quien reside en '+trim(c.pais)+',':'')+' pueda viajar y permanecer a su lado para brindarle cuidados y acompañamiento'+per+', por lo que atentamente solicito se le otorguen las facilidades necesarias para ello.');
+  else if(c.para==='pac') L.push('Por lo anterior, requiere reposo y permanecer en su domicilio'+per+'.');
+  if(trim(c.extra)) L.push(trim(c.extra));
+  L.push('Se extiende la presente a petición de la parte interesada, para los fines que a la misma convengan, en '+(trim(c.lugar)||'Guadalajara, Jalisco')+', a '+fLarga(c.fecha)+'.');
+  return L.join('\n\n');
+}
+function textoConsEn(){
+  var c=S.cons, p=S.pt, L=[], s=p.sexo, he=s==='F'?'she':s==='M'?'he':'the patient', his=s==='F'?'her':s==='M'?'his':'their';
+  L.push('The undersigned, Dr. Gabriela Alejandra López Ortiz, physician specialized in Anesthesiology and in Palliative Care and Pain Medicine, Mexican Professional License No. 6383462 and Specialty License No. 12184347, hereby CERTIFIES that:');
+  var a='The patient '+(trim(p.nombre)||'__________')+(p.edad?', '+p.edad+' years old,':'')+' is under my medical care in palliative care'+(c.desde?' since '+fLargaEn(c.desde):'')+
+    (c.inclDx&&trim(c.dxEn)?', with a diagnosis of '+trim(c.dxEn):'')+'.';
+  var est=ESTADO.filter(function(e){ return c.estado.indexOf(e[0])>=0; }).map(function(e){ return e[2]; });
+  if(est.length) a+=' At present '+he+' '+lista(est,'and')+'.';
+  L.push(a);
+  var per=(c.inicio?' starting on '+fLargaEn(c.inicio):'')+(trim(c.periodo)?' for '+(/^tiempo/.test(c.periodo)?'an indefinite period, while the illness lasts':trim(c.periodo).replace(/días?/,'days').replace(/^1 days/,'1 day')):'');
+  var rel=c.parent?his+' '+PARENT[c.parent]+' ':'', fam=rel+(trim(c.fam)||(c.parent?'':'a close relative'));
+  if(c.para==='fam_trab') L.push('Due to '+his+' medical condition, it is necessary for '+fam+' to remain by '+his+' side to provide care and companionship'+per+'. I kindly request that the necessary arrangements be granted at their workplace.');
+  else if(c.para==='fam_viaje') L.push('Due to '+his+' medical condition, it is important that '+fam+(trim(c.pais)?', who lives in '+trim(c.pais)+',':'')+' be able to travel and stay by '+his+' side to provide care and companionship'+per+'. I kindly request that all necessary arrangements be granted for this purpose.');
+  else if(c.para==='pac') L.push('Therefore, '+he+' requires rest and must remain at home'+per+'.');
+  L.push('This certificate is issued at the request of the interested party, for whatever purposes it may serve, in '+(trim(c.lugar)||'Guadalajara, Jalisco')+', Mexico, on '+fLargaEn(c.fecha)+'.');
+  return L.join('\n\n');
+}
+function textoDef(){
+  var d=S.def, p=S.pt, L=[];
+  L.push(DRA+' HACE CONSTAR que:');
+  var a=(p.sexo==='F'?'La C. ':p.sexo==='M'?'El C. ':'El (la) C. ')+(trim(p.nombre)||'__________')+(p.edad?', de '+p.edad+' años de edad,':'')+
+    (d.desde?' quien se encontraba bajo mi atención en cuidados paliativos desde el '+fLarga(d.desde)+',':'')+
+    (trim(d.cbas)?' con diagnóstico de '+low1(trim(d.cbas))+',':'')+
+    ' falleció en su domicilio'+(trim(d.dom)?', ubicado en '+trim(d.dom)+',':'')+' el día '+(fLarga(d.ffall)||'__________')+(d.hfall?' aproximadamente a las '+d.hfall+' horas':'')+'.';
+  L.push(a);
+  var sg=d.signos.slice();
+  L.push('Acudí al domicilio el día '+(fLarga(d.fconst)||'__________')+(d.hconst?' a las '+d.hconst+' horas':'')+' y constaté el fallecimiento'+(sg.length?' por '+lista(sg):'')+'.'+
+    (d.viol?' A la exploración externa no se encontraron huellas de violencia.':''));
+  L.push('El fallecimiento se debió a la evolución natural de su enfermedad'+(trim(d.ca)?', siendo la causa directa '+low1(trim(d.ca)):'')+'. Se trata de una muerte natural y esperada.');
+  if(trim(d.inf)) L.push('El fallecimiento fue notificado por '+trim(d.inf)+(d.infpar?', '+d.infpar+(p.sexo==='F'?' de la finada':p.sexo==='M'?' del finado':' de la persona fallecida'):'')+'.');
+  if(trim(d.folio)) L.push('Se expidió el certificado de defunción con folio '+trim(d.folio)+'.');
+  L.push('Se extiende la presente para los fines legales que a los familiares convengan, en '+(trim(d.lugar)||'Guadalajara, Jalisco')+', a '+fLarga(d.fecha)+'.');
+  return L.join('\n\n');
+}
+function textoDe(m){ var o=S[m]; if(m==='cons') return o.edit?o.texto:textoCons(); return o.edit?o.texto:textoDef(); }
+function prev(){ var el=$('prev'); if(!el) return; var t=cur==='cons'?textoCons()+(S.cons.ingles?'\n\n— English —\n\n'+textoConsEn():''):textoDef();
+  el.innerHTML=esc(t).replace(/HACE CONSTAR|CERTIFIES/g,'<b>$&</b>'); }
+
+/* ---------- navegación ---------- */
+var cur=null;
+function renderHome(){
+  $('ptHome').innerHTML=ptCard(false);
+  $('tiles').innerHTML=MODS.map(function(m){
+    return '<button type="button" class="tile" data-act="go" data-v="'+m.id+'" style="--c:var(--c-'+m.id+');--t:var(--t-'+m.id+')"><span class="ic">'+ICON[m.id]+'</span><span class="tx"><span class="tt">'+m.t+'</span><span class="ds">'+m.d+'</span></span>'+
+      '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
+  }).join('');
+}
+function renderMod(keep){
+  var y=window.scrollY, det=$('ptDet'), ab=det?det.open:null;
+  $('modTitle').textContent=mod(cur).t;
+  $('modBody').innerHTML=VIEW[cur]()+'<div class="row" style="margin-top:16px"><button type="button" class="btn ghost sm" data-act="limpiar">Borrar este documento</button></div>';
+  if(keep){ var d2=$('ptDet'); if(d2&&ab!==null) d2.open=ab; window.scrollTo(0,y); }
+  prev();
+}
+function route(){
+  var m=/^#\/(\w+)/.exec(location.hash), id=m&&mod(m[1])?m[1]:null;
+  cur=id; $('pdfMsg').textContent=''; $('pdfMsg').className='msg';
+  $('homeView').hidden=!!id; $('modView').hidden=!id;
+  if(id){ renderMod(false); window.scrollTo(0,0); precargar(); } else renderHome();
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- eventos ---------- */
+function onField(e){
+  var el=e.target, k=el.getAttribute&&el.getAttribute('data-k'); if(!k||el.tagName==='BUTTON') return;
+  if(el.type==='checkbox'){
+    if(el.hasAttribute('data-b')) setP(k,el.checked);
+    else{ var a=(getP(k)||[]).slice(), v=el.getAttribute('data-v'), i=a.indexOf(v); if(el.checked&&i<0) a.push(v); if(!el.checked&&i>=0) a.splice(i,1); setP(k,a); }
+  } else setP(k,el.value);
+  if(/\.nom$/.test(k)){ var w=$('w_'+k.replace(/\.nom$/,'').replace(/\./g,'_')); if(w) w.textContent=avisoMed(el.value);
+    if(e.type==='change'&&MEDS[el.value]){ var pk=k.replace(/\.nom$/,'.pres'); if(!/resc/.test(k)&&!trim(getP(pk))){ setP(pk,MEDS[el.value]); var pi=document.querySelector('[data-k="'+pk+'"]'); if(pi) pi.value=MEDS[el.value]; } } }
+  if(e.type==='change'&&el.hasAttribute('data-re')&&cur) renderMod(true);
+  if(e.type==='change'&&/^pt\./.test(k)&&cur){ var sm=document.querySelector('#ptDet summary span'); if(sm){ var p=S.pt; sm.innerHTML='<b>Paciente:</b> '+esc([p.nombre||'Sin nombre',p.edad?p.edad+' años':'',p.sexo==='F'?'mujer':p.sexo==='M'?'hombre':''].filter(Boolean).join(' · ')); } }
+  prev();
+}
+document.addEventListener('input',onField);
+document.addEventListener('change',onField);
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b) return;
+  var a=b.getAttribute('data-act'), k=b.getAttribute('data-k'), v=b.getAttribute('data-v');
+  if(a==='go'){ location.hash='#/'+v; return; }
+  if(a==='home'){ location.hash='#/'; return; }
+  if(a==='pdf'){ generar(); return; }
+  if(a==='set'){ setP(k,v); renderMod(true); return; }
+  if(a==='fill'){ setP(k,v); if(cur) renderMod(true); else renderHome(); return; }
+  if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:nuevoMed()); guardar(); renderMod(true);
+    var items=$('modBody').querySelectorAll('[data-k^="'+k+'.'+(arr.length-1)+'."]'); if(items[0]){ items[0].scrollIntoView({block:'center'}); try{ items[0].focus({preventScroll:true}); }catch(x){} } return; }
+  if(a==='del'){ getP(k).splice(+b.getAttribute('data-i'),1); guardar(); renderMod(true); return; }
+  if(a==='editar'){ var o=S[k]; o.texto=k==='cons'?textoCons():textoDef(); if(k==='cons') o.textoEn=textoConsEn(); o.edit=true; guardar(); renderMod(true); return; }
+  if(a==='regen'){ S[k].edit=false; guardar(); renderMod(true); return; }
+  if(a==='txReceta'){ S.res.tx=S.receta.meds.filter(function(m){ return trim(m.nom); }).map(function(m){ return lineaMed(m); }).join('\n'); guardar(); renderMod(true); return; }
+  if(a==='limpiar'){ if(!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent='Toque otra vez para borrar'; b.style.color='var(--danger)'; setTimeout(function(){ if(b.isConnected){ b.classList.remove('arm'); b.textContent='Borrar este documento'; b.style.color=''; } },3500); return; }
+    S[cur]=base()[cur]; guardar(); renderMod(false); window.scrollTo(0,0); return; }
+  if(a==='nuevo'){ if(!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent='Toque otra vez: se borra todo'; setTimeout(function(){ if(b.isConnected){ b.classList.remove('arm'); b.textContent='Nuevo paciente'; } },3500); return; }
+    S=base(); ss('docs_state',null); renderHome(); return; }
+});
+
+/* ---------- PDF ---------- */
+function via(o){ return o.via==='otra'?trim(o.viaO):o.via; }
+function frec(o){ return o.frec==='otra'?trim(o.frecO):o.frec; }
+function lineaMed(m){ return [trim(m.nom)+(trim(m.pres)?' '+trim(m.pres):''), trim(m.dosis), via(m), frec(m), trim(m.dur)?'durante '+trim(m.dur):''].filter(Boolean).join(', ')+(trim(m.para)?' (para '+trim(m.para)+')':''); }
+var cargando=null;
+function cargarJS(src){ return new Promise(function(ok,ko){ var s=document.createElement('script'); s.src=src; s.async=true; s.onload=ok; s.onerror=function(){ s.remove(); ko(); }; document.head.appendChild(s); }); }
+function precargar(){
+  if(!cargando) cargando=Promise.all([window.jspdf?1:cargarJS('../jspdf.js?v=12'),window.DOC_IMG?1:cargarJS('membrete.js?v=1')]).catch(function(){ cargando=null; throw new Error('red'); });
+  return cargando;
+}
+function msg(t,err){ var m=$('pdfMsg'); m.textContent=t; m.className='msg'+(err?' err':''); }
+function generar(){
+  var falta=validar(); if(falta){ msg(falta,true); return; }
+  msg('Preparando el PDF…');
+  precargar().then(function(){
+    var d=null; try{ d=PDF[cur](); }catch(e){ if(window.console) console.error(e); }
+    if(!d){ msg('No se pudo crear el PDF en este navegador.',true); return; }
+    guardarPDF(d);
+  },function(){ msg('No se pudo descargar el formato. Revise su conexión e intente de nuevo.',true); });
+}
+function validar(){
+  if(cur==='receta'&&!S.receta.meds.some(function(m){ return trim(m.nom); })&&!S.receta.resc.some(function(m){ return trim(m.nom); })) return 'Escriba al menos un medicamento.';
+  if(!trim(S.pt.nombre)) return 'Falta el nombre del paciente.';
+  if(cur==='def'&&!trim(S.def.cbas)&&!trim(S.def.ca)&&!S.def.edit) return 'Escriba la causa de la defunción.';
+  return '';
+}
+function guardarPDF(d){
+  var m=mod(cur), nom=m.arch+'_'+String(S.pt.nombre||'paciente').trim().replace(/[^A-Za-z0-9\u00c0-\u00ff]+/g,'_')+'_'+hoyISO()+'.pdf';
+  var blob=d.output('blob'), tactil=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+  try{ var file=new File([blob],nom,{type:'application/pdf'});
+    if(tactil&&navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:m.t}).catch(function(){}); msg('Elija «Guardar en Archivos», «Imprimir» o envíelo por WhatsApp.'); return; } }catch(e){}
+  var u=URL.createObjectURL(blob), a=document.createElement('a'); a.href=u; a.download=nom; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(u); },120000);
+  msg('PDF listo. Si no se abrió, búsquelo en Descargas.');
+}
+
+/* Motor de la hoja membretada (mismo membrete que las notas de KAIRÓS). */
+var W1252='€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ';
+var MAPCH={'≥':'>=','≤':'<=','→':'->','≈':'~','−':'-','‑':'-','‐':'-','✓':'-','₂':'2','⁺':'+',' ':' ',' ':' ','μ':'µ'};
+function win(t){ t=String(t==null?'':t); var o=''; for(var i=0;i<t.length;i++){ var c=t.charAt(i), k=t.charCodeAt(i);
+  if(MAPCH.hasOwnProperty(c)) o+=MAPCH[c]; else if(k<128||(k>=160&&k<256)||W1252.indexOf(c)>=0) o+=c; else if(k>=0xD800&&k<0xDC00) i++; }
+  return o; }
+function hoja(hdr,fechaTxt){
+  var J=window.jspdf.jsPDF, d=new J({unit:'pt',format:'letter',compress:true}), PW=612, PH=792, X0=48, X1=564, TOP=114, BOT=724;
+  var C={PLUM:[84,60,104],INK:[38,32,46],GRAY:[78,70,88],SOFT:[246,241,250],LINE:[221,210,230],LILAC:[217,192,230],ORCH:[150,118,175],CHIP:[238,229,245],SLATE:[138,108,160],WHITE:[255,255,255],RES:[176,80,42],RESBG:[252,240,234],RESLN:[236,200,184]};
+  var G={d:d,C:C,X0:X0,X1:X1,y:TOP};
+  var col=function(c,f){ d[f].apply(d,c); };
+  G.col=col;
+  function txt(s,x,yy,o){ d.text(win(s),x,yy,o||{}); }
+  function fnt(st,sz,c){ d.setFont('helvetica',st); d.setFontSize(sz); if(c) col(c,'setTextColor'); }
+  G.txt=txt; G.fnt=fnt;
+  function ico(k,x,cy){ col(C.SLATE,'setDrawColor'); col(C.SLATE,'setFillColor'); d.setLineWidth(0.6);
+    if(k==='pin'){ d.circle(x+3,cy-1.2,2.5,'F'); d.triangle(x+0.8,cy-0.4,x+5.2,cy-0.4,x+3,cy+3.2,'F'); col(C.WHITE,'setFillColor'); d.circle(x+3,cy-1.2,0.9,'F'); }
+    else if(k==='tel'){ d.roundedRect(x+1.2,cy-3.2,3.8,6.4,0.8,0.8,'S'); d.line(x+2.4,cy-2.2,x+3.8,cy-2.2); }
+    else if(k==='mail'){ d.rect(x,cy-2.4,6.4,4.8,'S'); d.line(x,cy-2.4,x+3.2,cy+0.4); d.line(x+3.2,cy+0.4,x+6.4,cy-2.4); }
+    else if(k==='ig'){ d.roundedRect(x,cy-3,6,6,1.7,1.7,'S'); d.circle(x+3,cy,1.35,'S'); d.circle(x+4.7,cy-1.7,0.3,'F'); }
+    else if(k==='wa'){ d.circle(x+3,cy,2.9,'S'); d.triangle(x+0.6,cy+3.4,x+1.2,cy+1.4,x+2.4,cy+2.4,'F'); }
+    else if(k==='yt'){ d.roundedRect(x,cy-2.4,6.6,4.8,1.3,1.3,'F'); col(C.WHITE,'setFillColor'); d.triangle(x+2.6,cy-1.3,x+2.6,cy+1.3,x+4.6,cy,'F'); }
+    else if(k==='web'){ d.circle(x+3,cy,3,'S'); d.ellipse(x+3,cy,1.3,3,'S'); d.line(x,cy,x+6,cy); } }
+  function membrete(){
+    try{ d.addImage(window.DOC_IMG.memb,'JPEG',0,0,PW,PH,'memb','FAST'); }catch(e){}
+    try{ d.addImage(window.DOC_IMG.logo,'JPEG',X0-4,34,80,65.1,'logo','FAST'); }catch(e){}
+    col(C.LILAC,'setDrawColor'); d.setLineWidth(0.8); d.line(X0+82,44,X0+82,96);
+    var hx=X0+92;
+    fnt('bold',13,C.PLUM); txt('Dra. Gabriela Alejandra López Ortiz',hx,57);
+    fnt('bold',6.9,C.ORCH); txt('ANESTESIOLOGÍA  |  MEDICINA PALIATIVA Y DEL DOLOR',hx,69);
+    fnt('normal',7.8,C.GRAY); txt('Universidad de Guadalajara  |  Universidad de Guanajuato',hx,80.5); txt('Cédula Prof.: 6383462  |  Cédula Esp.: 12184347',hx,91.5);
+    fnt('bold',12.5,C.PLUM); txt(hdr,X1,57,{align:'right'});
+    col(C.LILAC,'setFillColor'); d.roundedRect(X1-96,62,96,2.2,1.1,1.1,'F');
+    fnt('normal',8,C.GRAY); txt('Fecha: '+fechaTxt,X1,78,{align:'right'});
+    col(C.LILAC,'setDrawColor'); d.setLineWidth(0.6); d.line(X0,740,X1,740);
+    function fila(items,yy){ var x=X0; items.forEach(function(it){ ico(it[0],x,yy-2.5); fnt('normal',7.3,C.GRAY); txt(it[1],x+9.5,yy); x+=9.5+d.getTextWidth(win(it[1]))+13; }); }
+    fila([['pin','Amado Nervo 59, Col. Ladrón de Guevara, Guadalajara, Jalisco'],['tel','Urgencias 311 204 87 63'],['wa','Citas por WhatsApp 33 4480 1259']],753);
+    fila([['web','alleviarecarehome.com'],['mail','dra.gabyttc@gmail.com'],['ig','@dra.gaby_lopez_ortiz'],['yt','YouTube @gabrielaalejandralopezorti4979']],764);
+  }
+  G.nueva=function(){ d.addPage(); membrete(); G.y=TOP; };
+  G.hay=function(h){ if(G.y+h>BOT){ G.nueva(); return true; } return false; };
+  G.env=function(segs,size,maxw){
+    var toks=[], lines=[[]], wc=0;
+    segs.forEach(function(sg){ win(sg.t).split(/(\s+)/).forEach(function(w){ if(!w) return; toks.push({w:w,st:sg.b?'bold':(sg.i?'italic':'normal'),c:sg.c||null}); }); });
+    toks.forEach(function(k){ fnt(k.st,size); var tw=d.getTextWidth(k.w), sp=/^\s+$/.test(k.w), cl=lines[lines.length-1];
+      if(/\n/.test(k.w)){ lines.push([]); wc=0; return; }
+      if(sp&&!cl.length) return;
+      if(!sp&&wc+tw>maxw&&cl.length){ while(cl.length&&/^\s+$/.test(cl[cl.length-1].w)) cl.pop(); lines.push([]); wc=0; cl=lines[lines.length-1]; }
+      if(sp&&wc+tw>maxw) return;
+      k.tw=tw; cl.push(k); wc+=tw; });
+    return lines.filter(function(l){ return l.length; });
+  };
+  G.pintar=function(ln,x,yy,size,c){ ln.forEach(function(k){ fnt(k.st,size,k.c||c||C.INK); d.text(k.w,x,yy); x+=k.tw; }); };
+  G.parrafo=function(segs,o){ o=o||{}; var size=o.size||10, lead=o.lead||14, x=X0+(o.ind||0), lines=G.env(segs,size,X1-x-(o.r||0));
+    lines.forEach(function(ln){ G.hay(lead); G.pintar(ln,x,G.y+size*0.8,size,o.c); G.y+=lead; }); };
+  G.titulo=function(t,sub){ fnt('bold',15,C.PLUM); txt(t,X0,G.y+10); if(sub){ fnt('normal',8.5,C.GRAY); txt(sub,X0,G.y+23); } G.y+=sub?34:22; };
+  G.celdas=function(cs){ cs=cs.filter(function(c){ return trim(c[1]); }); if(!cs.length) return;
+    var tot=cs.reduce(function(a,c){ return a+c[2]; },0), gap=6, w=X1-X0-gap*(cs.length-1), x=X0;
+    fnt('normal',9.6); var ls=cs.map(function(c){ return d.splitTextToSize(win(c[1]),w*c[2]/tot-12).slice(0,3); });
+    var h=17+11.5*Math.max.apply(null,ls.map(function(l){ return l.length; }));
+    G.hay(h+6);
+    cs.forEach(function(c,i){ var cw=w*c[2]/tot; col(C.SOFT,'setFillColor'); col(C.LINE,'setDrawColor'); d.setLineWidth(0.6); d.roundedRect(x,G.y,cw,h,3,3,'FD');
+      fnt('bold',6.6,C.PLUM); txt(c[0].toUpperCase(),x+6,G.y+9.5);
+      fnt('normal',9.6,C.INK); ls[i].forEach(function(l,j){ d.text(l,x+6,G.y+21+j*11.5); }); x+=cw+gap; });
+    G.y+=h+5; };
+  G.banda=function(t,c){ G.hay(60); col(c||C.PLUM,'setFillColor'); d.roundedRect(X0,G.y,X1-X0,18,3,3,'F'); fnt('bold',9.6,C.WHITE); txt(t.toUpperCase(),X0+9,G.y+12.4); G.y+=25; };
+  G.li=function(t,o){ o=o||{}; var size=o.size||10, lead=o.lead||13.4, lines=G.env(typeof t==='string'?[{t:t}]:t,size,X1-X0-16);
+    lines.forEach(function(ln,i){ G.hay(lead); if(!i){ col(C.ORCH,'setFillColor'); d.circle(X0+5,G.y+5,1.8,'F'); } G.pintar(ln,X0+14,G.y+size*0.8,size); G.y+=lead; }); G.y+=2.5; };
+  G.firma=function(){
+    G.hay(72); G.y+=34;
+    col(C.INK,'setDrawColor'); d.setLineWidth(0.7); d.line(X1-210,G.y,X1,G.y);
+    fnt('bold',9,C.INK); txt('Dra. Gabriela Alejandra López Ortiz',X1-105,G.y+12,{align:'center'});
+    fnt('normal',7.8,C.GRAY); txt('Anestesiología · Medicina Paliativa y del Dolor',X1-105,G.y+22,{align:'center'}); txt('Céd. Prof. 6383462 · Céd. Esp. 12184347',X1-105,G.y+31,{align:'center'});
+    G.y+=36; };
+  G.fin=function(){ var N=d.getNumberOfPages(); if(N>1) for(var i=1;i<=N;i++){ d.setPage(i); fnt('normal',7.3,C.GRAY); txt('Página '+i+' de '+N,X1,764,{align:'right'}); } return d; };
+  d.setProperties({title:win(up1(hdr.toLowerCase())),author:'Dra. Gabriela Alejandra López Ortiz',creator:'KAIROS'});
+  membrete();
+  return G;
+}
+function pacCeldas(G,o){ var p=S.pt; o=o||{};
+  var sx=p.sexo==='F'?'Mujer':p.sexo==='M'?'Hombre':'';
+  G.celdas([['Paciente',p.nombre,0.48],['Edad',p.edad?p.edad+' años':'',0.13],['Sexo',sx,0.13],['Peso',p.peso?p.peso+' kg':'',0.13],['Talla',p.talla?p.talla+' cm':'',0.13]]);
+  G.celdas([['Diagnóstico',o.dx===false?'':p.dx,0.64],['Alergias',p.alergias||'No referidas',0.36]]);
+}
+/* tarjeta de medicamento en formato fácil */
+function tarjetaMed(G,m,n){
+  var d=G.d, C=G.C, X0=G.X0, X1=G.X1, W=X1-X0, pad=10, ix=X0+34, iw=X1-ix-pad;
+  var tit=G.env([{t:trim(m.nom),b:1,c:C.PLUM},{t:trim(m.pres)?'  '+trim(m.pres):'',c:C.GRAY}],11.5,iw);
+  var cols=[['Dosis',trim(m.dosis)],['Cómo',via(m)],['Cada cuánto',frec(m)],['Cuánto tiempo',trim(m.dur)]].filter(function(c){ return c[1]; });
+  var cw=cols.length?(iw-(cols.length-1)*6)/cols.length:0;
+  var cl=cols.map(function(c){ return G.env([{t:c[1]}],10,cw-10); });
+  var ch=cols.length?Math.max.apply(null,cl.map(function(l){ return l.length; }))*12.5+17:0;
+  var ext=[]; if(trim(m.para)) ext.push([{t:'Para: ',b:1,c:C.PLUM},{t:trim(m.para)}]); if(trim(m.extra)) ext.push([{t:'Indicaciones: ',b:1,c:C.PLUM},{t:trim(m.extra)}]); if(trim(m.cant)) ext.push([{t:'Surtir: ',b:1,c:C.PLUM},{t:trim(m.cant)}]);
+  var el=ext.map(function(s){ return G.env(s,10,iw); });
+  var h=pad+tit.length*14+(ch?ch+6:0)+el.reduce(function(a,l){ return a+l.length*13.2; },0)+pad-2;
+  G.hay(h+8);
+  var y0=G.y;
+  G.col(C.WHITE,'setFillColor'); G.col(C.LINE,'setDrawColor'); d.setLineWidth(0.7); d.roundedRect(X0,y0,W,h,5,5,'FD');
+  G.col(C.PLUM,'setFillColor'); d.circle(X0+17,y0+pad+6,8,'F'); G.fnt('bold',n>9?8:9.5,C.WHITE); G.txt(String(n),X0+17,y0+pad+9.3,{align:'center'});
+  var y=y0+pad; tit.forEach(function(ln){ G.pintar(ln,ix,y+10,11.5); y+=14; });
+  if(ch){ var x=ix; y+=2; cols.forEach(function(c,i){ G.col(C.SOFT,'setFillColor'); d.roundedRect(x,y,cw,ch-4,3,3,'F');
+      G.fnt('bold',6.6,C.PLUM); G.txt(c[0].toUpperCase(),x+5,y+9); var yy=y+21; cl[i].forEach(function(ln){ G.pintar(ln,x+5,yy,10); yy+=12.5; }); x+=cw+6; });
+    y+=ch+4; }
+  el.forEach(function(lns){ lns.forEach(function(ln){ G.pintar(ln,ix,y+9,10); y+=13.2; }); });
+  G.y=y0+h+8;
+}
+function tarjetaResc(G,r,n){
+  var d=G.d, C=G.C, X0=G.X0, X1=G.X1, W=X1-X0, pad=9, ix=X0+12, iw=W-24;
+  var l1=G.env([{t:'SI PRESENTA '+(trim(r.sint)||'el síntoma').toUpperCase()+':',b:1,c:C.RES}],9.6,iw);
+  var dar=[trim(r.nom),trim(r.dosis),via(r)].filter(Boolean).join(' ');
+  var s2=[{t:'Dar ',c:C.INK},{t:dar||'—',b:1}];
+  var rep=[]; if(trim(r.int)) rep.push('Puede repetir cada '+trim(r.int)+'.'); if(trim(r.max)) rep.push('Máximo '+trim(r.max)+' al día.');
+  if(rep.length) s2.push({t:'.  '+rep.join(' ')}); else s2.push({t:'.'});
+  var l2=G.env(s2,10.4,iw), l3=trim(r.nota)?G.env([{t:trim(r.nota),i:1}],9.4,iw):[];
+  var h=pad+l1.length*12.5+l2.length*13.6+l3.length*12.4+pad-2;
+  G.hay(h+7); var y0=G.y;
+  G.col(C.RESBG,'setFillColor'); G.col(C.RESLN,'setDrawColor'); d.setLineWidth(0.7); d.roundedRect(X0,y0,W,h,5,5,'FD');
+  G.col(C.RES,'setFillColor'); d.rect(X0,y0+0.4,3.5,h-0.8,'F');
+  var y=y0+pad; l1.forEach(function(ln){ G.pintar(ln,ix,y+8.5,9.6); y+=12.5; }); l2.forEach(function(ln){ G.pintar(ln,ix,y+9.5,10.4); y+=13.6; }); l3.forEach(function(ln){ G.pintar(ln,ix,y+8.5,9.4,C.GRAY); y+=12.4; });
+  G.y=y0+h+7;
+}
+function bloqueTexto(G,t,o){ String(t||'').split(/\n\s*\n/).forEach(function(par,i){ var segs=[]; par.replace(/\n/g,' ').split(/(HACE CONSTAR|CERTIFIES)/).forEach(function(s){ if(s) segs.push({t:s,b:/^(HACE CONSTAR|CERTIFIES)$/.test(s)}); });
+  G.parrafo(segs,{size:o&&o.size||10.8,lead:o&&o.lead||16}); G.y+=8; }); }
+function lineas(t){ return String(t||'').split('\n').map(trim).filter(Boolean); }
+
+var PDF={};
+PDF.receta=function(){ var r=S.receta, G=hoja('RECETA MÉDICA',fCorta(r.fecha));
+  pacCeldas(G);
+  var meds=r.meds.filter(function(m){ return trim(m.nom); }), resc=r.resc.filter(function(m){ return trim(m.nom)||trim(m.sint); });
+  if(meds.length){ G.banda('Medicamentos'); meds.forEach(function(m,i){ tarjetaMed(G,m,i+1); }); G.y+=4; }
+  if(resc.length){ G.banda('Rescates: sólo si se necesitan',G.C.RES); resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); }); G.y+=4; }
+  if(trim(r.recom)){ G.banda('Recomendaciones'); lineas(r.recom).forEach(function(l){ G.li(l); }); }
+  if(trim(r.cita)){ G.y+=4; G.parrafo([{t:'Próxima cita: ',b:1,c:G.C.PLUM},{t:trim(r.cita)}]); }
+  G.firma(); return G.fin();
+};
+PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICAS',fCorta(o.fecha)+(o.hora?' '+o.hora:''));
+  G.titulo(dom?'Indicaciones médicas en domicilio':'Indicaciones médicas hospitalarias',dom?'Medicina del Dolor y Cuidados Paliativos':(trim(o.hosp)||'Medicina del Dolor y Cuidados Paliativos'));
+  pacCeldas(G);
+  if(dom&&(trim(o.cuid)||trim(o.tel))) G.celdas([['Cuidador principal',o.cuid,0.65],['Teléfono',o.tel,0.35]]);
+  if(!dom&&(trim(o.cama)||trim(o.exp))) G.celdas([['Cama',o.cama,0.3],['Expediente',o.exp,0.7]]);
+  var n=0, sec=function(t){ n++; G.banda(n+'. '+t); };
+  sec('Dieta'); G.parrafo([{t:o.dieta==='Otra'?(trim(o.dietaO)||'—'):(o.dieta||'—'),b:1}],{size:10.6}); G.y+=6;
+  sec('Soluciones'); var sol=o.sol.filter(function(s){ return trim(s.tipo); });
+  if(!sol.length) G.li('Sin soluciones.'); else sol.forEach(function(s){ G.li([{t:trim(s.tipo)+(trim(s.vol)?' '+trim(s.vol):''),b:1},{t:(s.via?', vía '+s.via:'')+(trim(s.tiempo)?', para pasar en '+trim(s.tiempo):'')+(trim(s.extra)?'. '+trim(s.extra):'')+'.'}]); });
+  G.y+=4;
+  sec('Medicamentos'); var meds=o.meds.filter(function(m){ return trim(m.nom); });
+  if(!meds.length) G.li('Sin medicamentos.');
+  else if(dom) meds.forEach(function(m,i){ tarjetaMed(G,m,i+1); });
+  else meds.forEach(function(m){ G.li([{t:trim(m.nom)+(trim(m.pres)?' '+trim(m.pres):''),b:1},{t:': '+[trim(m.dosis),via(m),frec(m)].filter(Boolean).join(', ')+(trim(m.dur)?', durante '+trim(m.dur):'')+(trim(m.para)?' ('+trim(m.para)+')':'')+(trim(m.extra)?'. '+trim(m.extra):'')+'.'}]); });
+  G.y+=4;
+  var resc=o.resc.filter(function(m){ return trim(m.nom); });
+  sec('Medicamentos de rescate'); if(!resc.length) G.li('Sin rescates indicados.'); else resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); });
+  G.y+=4;
+  var gen=GEN[o.amb].filter(function(x){ return o.gen.indexOf(x)>=0; }).concat(lineas(o.genO));
+  if(gen.length){ sec('Medidas generales'); gen.forEach(function(x){ G.li(x); }); G.y+=4; }
+  var conf=CONF.filter(function(x){ return o.conf.indexOf(x)>=0; }).concat(lineas(o.confO));
+  if(conf.length){ sec('Medidas de confort'); conf.forEach(function(x){ G.li(x); }); G.y+=4; }
+  var al=ALARMA[o.amb].filter(function(x){ return o.alarma.indexOf(x)>=0; });
+  if(al.length){ sec(dom?'Llamar a la doctora si...':'Avisar al médico si...'); al.forEach(function(x){ G.li(x); });
+    if(dom){ G.y+=2; G.parrafo([{t:'Urgencias: 311 204 87 63',b:1,c:G.C.PLUM},{t:'   ·   Citas por WhatsApp: 33 4480 1259'}]); } G.y+=4; }
+  if(!dom&&trim(o.estudios)){ sec('Estudios e interconsultas'); lineas(o.estudios).forEach(function(x){ G.li(x); }); G.y+=4; }
+  if(trim(o.otras)){ sec('Otras indicaciones'); lineas(o.otras).forEach(function(x){ G.li(x); }); }
+  G.firma(); return G.fin();
+};
+PDF.cons=function(){ var c=S.cons, G=hoja('CONSTANCIA MÉDICA',fCorta(c.fecha));
+  G.y+=6; G.titulo('Constancia médica'); G.y+=4;
+  G.parrafo([{t:trim(c.dest)||'A quien corresponda',b:1}],{size:11}); G.y+=4; G.parrafo([{t:'P r e s e n t e',b:1}],{size:10}); G.y+=12;
+  bloqueTexto(G,c.edit?c.texto:textoCons());
+  G.firma();
+  if(c.ingles){ G.nueva(); G.y+=6; G.titulo('Medical certificate'); G.y+=4;
+    G.parrafo([{t:'To whom it may concern',b:1}],{size:11}); G.y+=16; bloqueTexto(G,c.edit?c.textoEn:textoConsEn()); G.firma(); }
+  return G.fin();
+};
+PDF.res=function(){ var r=S.res, G=hoja('RESUMEN MÉDICO',fCorta(r.fecha));
+  G.titulo('Resumen médico',r.motivo||'Medicina del Dolor y Cuidados Paliativos');
+  pacCeldas(G,{dx:false});
+  if(trim(r.dest)){ G.parrafo([{t:'Para: ',b:1,c:G.C.PLUM},{t:trim(r.dest)}]); G.y+=8; }
+  var secs=[['Diagnósticos',r.dxs,1],['Antecedentes de importancia',r.ant],['Resumen clínico y evolución',r.evol],['Estado actual',r.estado],['Estudios relevantes',r.estudios],['Tratamiento actual',r.tx,1],['Plan y recomendaciones',r.plan],['Pronóstico',r.pron]];
+  if(!trim(r.dxs)&&trim(S.pt.dx)) secs[0][1]=S.pt.dx;
+  secs.forEach(function(s){ if(!trim(s[1])) return; G.banda(s[0]);
+    if(s[2]) lineas(s[1]).forEach(function(l){ G.li(l); }); else String(s[1]).split(/\n\s*\n/).forEach(function(p){ G.parrafo([{t:p.replace(/\n/g,' ')}],{lead:14.2}); G.y+=4; });
+    G.y+=4; });
+  G.y+=4; G.parrafo([{t:(trim(r.lugar)||'Guadalajara, Jalisco')+', a '+fLarga(r.fecha)+'.'}],{c:G.C.GRAY,size:9.4});
+  G.firma(); return G.fin();
+};
+PDF.def=function(){ var o=S.def, G=hoja('PARTE MÉDICO',fCorta(o.fecha));
+  G.titulo('Parte médico de defunción','Fallecimiento en domicilio · Medicina del Dolor y Cuidados Paliativos');
+  var p=S.pt, sx=p.sexo==='F'?'Mujer':p.sexo==='M'?'Hombre':'';
+  G.celdas([['Nombre',p.nombre,0.58],['Edad',p.edad?p.edad+' años':'',0.18],['Sexo',sx,0.24]]);
+  G.celdas([['Fecha y hora del fallecimiento',fCorta(o.ffall)+(o.hfall?'  '+o.hfall+' h':''),0.5],['Constatado por la médica',fCorta(o.fconst)+(o.hconst?'  '+o.hconst+' h':''),0.5]]);
+  G.y+=8; bloqueTexto(G,o.edit?o.texto:textoDef(),{size:10.4,lead:15});
+  var cs=[['a) Causa directa',o.ca,o.ta],['b) Debida a',o.cb,o.tb],['c) Debida a',o.cc,o.tc],['Causa básica',o.cbas,o.tbas]].filter(function(c){ return trim(c[1]); });
+  if(cs.length||trim(o.otros)){ G.banda('Causas de la defunción');
+    var d=G.d, C=G.C, X0=G.X0, X1=G.X1, w1=110, w3=90;
+    cs.forEach(function(c){ var l=G.env([{t:trim(c[1])}],10,X1-X0-w1-w3-16), h=l.length*13+10; G.hay(h);
+      G.col(C.LINE,'setDrawColor'); d.setLineWidth(0.5); G.col(C.SOFT,'setFillColor'); d.rect(X0,G.y,w1,h,'FD'); G.col(C.WHITE,'setFillColor'); d.rect(X0+w1,G.y,X1-X0-w1-w3,h,'FD'); d.rect(X1-w3,G.y,w3,h,'FD');
+      G.fnt('bold',8.6,C.PLUM); G.txt(c[0],X0+6,G.y+14); var yy=G.y+5; l.forEach(function(ln){ G.pintar(ln,X0+w1+6,yy+9,10); yy+=13; });
+      G.fnt('normal',9,C.GRAY); G.txt(trim(c[2])||'',X1-w3+6,G.y+14); G.y+=h; });
+    if(trim(o.otros)){ G.y+=8; G.parrafo([{t:'Otras enfermedades que contribuyeron: ',b:1,c:C.PLUM},{t:trim(o.otros).replace(/\n/g,'; ')}]); }
+    G.y+=6; }
+  G.firma();
+  G.y+=10; G.parrafo([{t:'Este parte médico informa la causa del fallecimiento. No sustituye al Certificado de Defunción oficial, que es el documento para el registro civil.',i:1}],{size:8,lead:10.5,c:G.C.GRAY});
+  return G.fin();
+};
+
+/* ---------- inicio ---------- */
+$('dlMed').innerHTML=Object.keys(MEDS).map(function(k){ return '<option value="'+esc(k)+'">'; }).join('');
+cargar(); route();
+})();
+</script>
+</body>
+</html>
