@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Datos para tu factura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+
+/* Layout: una sola columna tipo hoja clínica; dos secciones (datos fiscales, pago) y un resumen listo para enviar */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --fg:#1d2b27; --muted:#5b6c66; --line:#d6e0dc;
+  --accent:#2f6b5c; --accent-fg:#ffffff; --accent-soft:#e3efeb; --warn:#8a5a12; --warn-soft:#fbf1df; --err:#b03a2e;
+  --display:"Literata",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121a18; --surface:#18221f; --fg:#e4ece9; --muted:#9db0a9; --line:#2c3a36;
+  --accent:#7cc4ae; --accent-fg:#0f1d19; --accent-soft:#1f3530; --warn:#e8bd6f; --warn-soft:#2e2615; --err:#f08a7e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a18; --surface:#18221f; --fg:#e4ece9; --muted:#9db0a9; --line:#2c3a36;
+  --accent:#7cc4ae; --accent-fg:#0f1d19; --accent-soft:#1f3530; --warn:#e8bd6f; --warn-soft:#2e2615; --err:#f08a7e; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:640px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:grid;gap:6px}
+.brand{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:500;font-size:clamp(26px,6vw,34px);line-height:1.15;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:0;max-width:60ch}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:10px;margin:0;padding:18px 16px 20px;display:grid;gap:16px;min-width:0}
+legend{font-family:var(--display);font-weight:600;font-size:19px;padding:0 6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:520px){.row{grid-template-columns:1fr}}
+.field{display:grid;gap:6px;min-width:0}
+label{font-weight:600;font-size:14px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;width:100%;box-sizing:border-box;min-width:0}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[aria-invalid="true"],select[aria-invalid="true"]{border-color:var(--err)}
+.err{color:var(--err);font-size:13px;margin:0}
+.mono{font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.money{font-variant-numeric:tabular-nums}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.check input{width:20px;height:20px;margin-top:2px;flex:none}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:14px;margin:0}
+.btn{font:inherit;font-weight:600;border:0;border-radius:999px;padding:13px 22px;cursor:pointer;background:var(--accent);color:var(--accent-fg);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+#resumen{border:1.5px solid var(--accent);background:var(--surface);border-radius:10px;padding:18px 16px;display:grid;gap:14px}
+#resumen h2{font-family:var(--display);font-weight:600;font-size:21px;margin:0}
+.folio{font-family:var(--mono);font-size:13px;color:var(--muted)}
+dl{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:6px 14px;margin:0;font-size:15px}
+dt{color:var(--muted)}
+dd{margin:0;min-width:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.sec{grid-column:1/-1;font-weight:600;color:var(--accent);margin-top:8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.ok{color:var(--accent);font-size:14px;margin:0;min-height:1.2em}
+footer{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){#resumen{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Facturación</div>
+    <h1>Datos para tu factura</h1>
+    <p class="lead">Llena este formulario una sola vez por pago. Al terminar, toca <b>Enviar por WhatsApp</b> y tus datos llegan completos para emitir tu factura (CFDI 4.0).</p>
+  </header>
+
+  <form id="f" novalidate>
+    <div style="display:grid;gap:22px">
+    <fieldset>
+      <legend>Datos fiscales</legend>
+      <p class="hint">Escríbelos exactamente como aparecen en tu Constancia de Situación Fiscal del SAT.</p>
+      <div class="field">
+        <label for="rfc">RFC</label>
+        <input id="rfc" name="rfc" class="mono" maxlength="13" autocomplete="off" placeholder="XAXX010101000" required>
+        <p class="err" id="rfc-err" hidden>Revisa el RFC: 13 caracteres si eres persona física, 12 si es empresa.</p>
+      </div>
+      <div class="field">
+        <label for="nombre">Nombre o razón social</label>
+        <input id="nombre" name="nombre" autocomplete="name" placeholder="Como en la constancia, sin “S.A. de C.V.”" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="cp">Código postal fiscal</label>
+          <input id="cp" name="cp" inputmode="numeric" maxlength="5" placeholder="5 dígitos" required>
+          <p class="err" id="cp-err" hidden>El código postal debe tener 5 dígitos.</p>
+        </div>
+        <div class="field">
+          <label for="regimen">Régimen fiscal</label>
+          <select id="regimen" name="regimen" required>
+            <option value="">Elige uno</option>
+            <option value="605">605 · Sueldos y salarios</option>
+            <option value="612">612 · Actividades empresariales y profesionales</option>
+            <option value="626">626 · Régimen Simplificado de Confianza (RESICO)</option>
+            <option value="606">606 · Arrendamiento</option>
+            <option value="616">616 · Sin obligaciones fiscales</option>
+            <option value="621">621 · Incorporación fiscal</option>
+            <option value="625">625 · Plataformas tecnológicas</option>
+            <option value="608">608 · Demás ingresos</option>
+            <option value="611">611 · Dividendos</option>
+            <option value="614">614 · Intereses</option>
+            <option value="601">601 · General de Ley Personas Morales</option>
+            <option value="603">603 · Personas Morales con Fines no Lucrativos</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="uso">Uso del CFDI</label>
+        <select id="uso" name="uso" required>
+          <option value="D01">D01 · Honorarios médicos, dentales y gastos hospitalarios</option>
+          <option value="G03">G03 · Gastos en general</option>
+          <option value="S01">S01 · Sin efectos fiscales</option>
+          <option value="CP01">CP01 · Pagos</option>
+        </select>
+        <p class="hint">D01 es el que sirve para deducir en tu declaración anual.</p>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="correo">Correo para recibir la factura</label>
+          <input id="correo" name="correo" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+          <p class="err" id="correo-err" hidden>Escribe un correo válido.</p>
+        </div>
+        <div class="field">
+          <label for="tel">Teléfono (opcional)</label>
+          <input id="tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="10 dígitos">
+        </div>
+      </div>
+      <label class="check" for="recordar"><input type="checkbox" id="recordar" checked> Recordar mis datos fiscales en este teléfono para la próxima vez</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Datos del pago</legend>
+      <div class="field">
+        <label for="paciente">Nombre del paciente</label>
+        <input id="paciente" name="paciente" placeholder="Si es la misma persona, déjalo vacío">
+      </div>
+      <div class="field">
+        <label for="concepto">Concepto</label>
+        <select id="concepto" name="concepto" required>
+          <option value="Consulta médica de cuidados paliativos">Consulta médica de cuidados paliativos</option>
+          <option value="Consulta médica domiciliaria de cuidados paliativos">Consulta médica domiciliaria</option>
+          <option value="Consulta médica de seguimiento por telemedicina">Consulta de seguimiento por telemedicina</option>
+          <option value="Valoración médica inicial de cuidados paliativos">Valoración inicial</option>
+          <option value="Procedimiento médico">Procedimiento médico</option>
+          <option value="otro">Otro (escribir)</option>
+        </select>
+        <input id="conceptoOtro" name="conceptoOtro" placeholder="Describe el servicio" hidden>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="fecha">Fecha del pago</label>
+          <input id="fecha" name="fecha" type="date" required>
+        </div>
+        <div class="field">
+          <label for="monto">Monto pagado (MXN)</label>
+          <input id="monto" name="monto" class="money" inputmode="decimal" placeholder="1500.00" required>
+          <p class="err" id="monto-err" hidden>Escribe el monto en números.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="forma">Forma de pago</label>
+          <select id="forma" name="forma" required>
+            <option value="03">03 · Transferencia</option>
+            <option value="04">04 · Tarjeta de crédito</option>
+            <option value="28">28 · Tarjeta de débito</option>
+            <option value="01">01 · Efectivo</option>
+            <option value="02">02 · Cheque</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ref">Referencia o últimos 4 dígitos</label>
+          <input id="ref" name="ref" placeholder="Opcional">
+        </div>
+      </div>
+      <p class="note" id="efectivo" hidden>Los pagos en efectivo no son deducibles como gasto médico. Si quieres deducirlo, conviene pagar con transferencia o tarjeta.</p>
+    </fieldset>
+
+    <div class="actions"><button class="btn" type="submit">Revisar y enviar</button></div>
+    </div>
+  </form>
+
+  <section id="resumen" hidden aria-live="polite">
+    <div>
+      <h2>Revisa tus datos</h2>
+      <div class="folio" id="folio"></div>
+    </div>
+    <dl id="dl"></dl>
+    <p class="hint">Después de enviar, si tienes tu Constancia de Situación Fiscal en PDF, mándala en el mismo chat. Ayuda a que no haya errores.</p>
+    <div class="actions">
+      <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+      <button class="btn ghost" type="button" id="copiar">Copiar datos</button>
+      <button class="btn ghost" type="button" id="editar">Corregir</button>
+    </div>
+    <p class="ok" id="ok"></p>
+    <textarea id="txt" rows="8" readonly hidden></textarea>
+  </section>
+
+  <footer>Tus datos solo se usan para emitir tu comprobante fiscal.</footer>
+</div>
+
+<script>
+// Número de WhatsApp que recibe los datos (con 52 de México). Vacío = el paciente elige el contacto.
+// También se puede poner en el enlace: ...#5215512345678
+const WHATSAPP = "";
+const $ = id => document.getElementById(id);
+const store = {get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const FISCALES = ["rfc","nombre","cp","regimen","uso","correo","tel"];
+
+$("fecha").value = new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const guardado = store.get("factura-fiscales");
+if (guardado) FISCALES.forEach(k => { if (guardado[k]) $(k).value = guardado[k]; });
+
+$("rfc").addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().replace(/\s/g,""); });
+$("concepto").addEventListener("change", e => { $("conceptoOtro").hidden = e.target.value !== "otro"; });
+$("forma").addEventListener("change", e => { $("efectivo").hidden = e.target.value !== "01"; });
+
+const sel = id => $(id).options[$(id).selectedIndex].text;
+function check(id, ok){ $(id).setAttribute("aria-invalid", ok ? "false" : "true"); const m=$(id+"-err"); if(m) m.hidden = ok; return ok; }
+
+function validar(){
+  let ok = true;
+  ok = check("rfc", /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test($("rfc").value)) && ok;
+  ok = check("nombre", $("nombre").value.trim().length > 1) && ok;
+  ok = check("cp", /^\d{5}$/.test($("cp").value.trim())) && ok;
+  ok = check("regimen", !!$("regimen").value) && ok;
+  ok = check("correo", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("correo").value.trim())) && ok;
+  ok = check("fecha", !!$("fecha").value) && ok;
+  ok = check("monto", /^\d+(\.\d{1,2})?$/.test($("monto").value.replace(/[$,\s]/g,""))) && ok;
+  if ($("concepto").value === "otro") ok = check("conceptoOtro", $("conceptoOtro").value.trim().length > 2) && ok;
+  return ok;
+}
+
+function datos(){
+  const monto = Number($("monto").value.replace(/[$,\s]/g,""));
+  const concepto = $("concepto").value === "otro" ? $("conceptoOtro").value.trim() : $("concepto").value;
+  const [y,m,d] = $("fecha").value.split("-");
+  return [
+    ["Datos fiscales"],
+    ["RFC", $("rfc").value],
+    ["Nombre / razón social", $("nombre").value.trim().toUpperCase()],
+    ["C.P. fiscal", $("cp").value.trim()],
+    ["Régimen fiscal", sel("regimen")],
+    ["Uso CFDI", sel("uso")],
+    ["Correo", $("correo").value.trim()],
+    ["Teléfono", $("tel").value.trim() || "—"],
+    ["Pago"],
+    ["Paciente", $("paciente").value.trim() || "El mismo titular"],
+    ["Concepto", concepto],
+    ["Fecha de pago", `${d}/${m}/${y}`],
+    ["Monto", monto.toLocaleString("es-MX",{style:"currency",currency:"MXN"})],
+    ["Forma de pago", sel("forma")],
+    ["Referencia", $("ref").value.trim() || "—"],
+  ];
+}
+
+function texto(filas, folio){
+  const out = ["*Solicitud de factura*", "Folio: " + folio, ""];
+  filas.forEach(f => out.push(f.length === 1 ? `\n*${f[0]}*` : `${f[0]}: ${f[1]}`));
+  return out.join("\n").replace(/\n{3,}/g,"\n\n");
+}
+
+$("f").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!validar()) { const bad = document.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+  if ($("recordar").checked) { const g={}; FISCALES.forEach(k => g[k] = $(k).value); store.set("factura-fiscales", g); }
+  else store.del("factura-fiscales");
+  const folio = "FAC-" + $("fecha").value.replace(/-/g,"").slice(2) + "-" + $("rfc").value.slice(0,4);
+  const filas = datos();
+  const dl = $("dl"); dl.textContent = "";
+  filas.forEach(f => {
+    if (f.length === 1) { const s=document.createElement("div"); s.className="sec"; s.textContent=f[0]; dl.append(s); return; }
+    const dt=document.createElement("dt"); dt.textContent=f[0]; const dd=document.createElement("dd"); dd.textContent=f[1]; dl.append(dt,dd);
+  });
+  $("folio").textContent = "Folio " + folio;
+  const t = texto(filas, folio); $("txt").value = t;
+  const num = (/^\d{10,15}$/.test(location.hash.slice(1)) ? location.hash.slice(1) : WHATSAPP);
+  $("wa").href = "https://wa.me/" + num + "?text=" + encodeURIComponent(t);
+  $("ok").textContent = "";
+  $("f").hidden = true; $("resumen").hidden = false; $("resumen").scrollIntoView({block:"start"});
+});
+
+$("editar").addEventListener("click", () => { $("resumen").hidden = true; $("f").hidden = false; });
+$("copiar").addEventListener("click", () => {
+  const t = $("txt").value;
+  const fallback = () => { $("txt").hidden = false; $("txt").select(); $("ok").textContent = "Selecciona el texto y cópialo."; };
+  try { navigator.clipboard.writeText(t).then(() => { $("ok").textContent = "Datos copiados. Pégalos en el chat de WhatsApp."; }, fallback); } catch(e){ fallback(); }
+});
+</script>
+</body>
+</html>
