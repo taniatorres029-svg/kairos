@@ -218,6 +218,7 @@ var PSICO=/midazolam|lorazepam|clonazepam|alprazolam|diazepam|zolpidem|fenobarbi
 var VIAS=['por boca (vía oral)','debajo de la lengua (sublingual)','subcutánea','intravenosa','intramuscular','parche en la piel (transdérmica)','en la piel (tópica)','por el recto','inhalada / nebulizada','por la sonda de alimentación','en los ojos','otra'];
 var FREC=['cada 4 horas','cada 6 horas','cada 8 horas','cada 12 horas','cada 24 horas (una vez al día)','cada 72 horas (cambiar parche)','en la mañana','en la noche, al acostarse','antes de cada comida','en infusión continua (bomba)','dosis única','otra'];
 var DIETAS=['Ayuno','Líquidos claros','Dieta líquida completa','Dieta blanda','Dieta en papilla / licuada','Dieta normal a tolerancia','Dieta de confort (lo que desee y tolere)','Dieta para diabético','Dieta baja en sal','Alimentación por sonda','Otra'];
+var ACTIV=['Reposo absoluto en cama','Reposo relativo','Reposo en cama con cabecera elevada','Puede sentarse en sillón','Deambulación asistida','Deambulación libre','Actividad a tolerancia','Movilización pasiva por cuidador / enfermería'];
 var GEN={
  dom:['Vigilar el estado de alerta, la respiración y el dolor varias veces al día','Anotar diario los síntomas y los rescates que se usaron (registro de síntomas)','Cambios de posición cada 2 horas si pasa la mayor parte del tiempo en cama','Cabecera elevada a 30-45 grados','Vigilar evacuaciones: avisar si pasan 3 días sin evacuar','Vigilar que orine; avisar si pasan 12 horas sin orinar','Cuidar el sitio de la mariposa subcutánea; cambiarla si se enrojece o duele','Prevenir caídas: acompañarlo al levantarse y al ir al baño','Dar los medicamentos a la misma hora todos los días'],
  hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno']
@@ -271,7 +272,7 @@ function base(){
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
     receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
-    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],activ:'',estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
     def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
@@ -396,7 +397,7 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
     '<button type="button" class="btn add" data-act="add" data-k="ind.meds">+ Agregar medicamento</button></div>'+
   '<div class="card"><h3>5. Medicamentos de rescate</h3>'+d.resc.map(function(m,i){ return rescCard('ind.resc',i); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="ind.resc">+ Agregar rescate</button></div>'+
-  '<div class="card"><h3>6. Medidas generales</h3>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>6. Medidas generales</h3><p class="hint">Actividad física: toque una opción.</p>'+chips('ind.activ',ACTIV)+'<p class="hint" style="margin:12px 0 4px">Otras medidas</p>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>7. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>8. Informar eventualidades</h3><p class="hint">'+(dom?'A quién llamar si pasa algo fuera de lo esperado.':'A quién avisar de cualquier eventualidad.')+'</p><div class="fields">'+
     fT('ind.evtA',dom?'Llamar a':'Informar a',{c:'w2'})+fT('ind.evtTel','Teléfono',{c:'w2',type:'tel',im:'tel'})+'</div>'+
@@ -800,6 +801,7 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
   sec('Medicamentos de rescate'); if(!resc.length) G.li('Sin rescates indicados.'); else resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); });
   G.y+=4;
   var gen=GEN[o.amb].filter(function(x){ return o.gen.indexOf(x)>=0; }).concat(lineas(o.genO));
+  if(o.activ) gen.unshift([{t:'Actividad: ',b:1,c:G.C.PLUM},{t:low1(o.activ)+'.',b:1}]);
   if(gen.length){ sec('Medidas generales'); gen.forEach(function(x){ G.li(x); }); G.y+=4; }
   var conf=CONF.filter(function(x){ return o.conf.indexOf(x)>=0; }).concat(lineas(o.confO));
   if(conf.length){ sec('Medidas de confort'); conf.forEach(function(x){ G.li(x); }); G.y+=4; }
