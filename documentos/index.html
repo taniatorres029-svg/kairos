@@ -190,6 +190,7 @@ footer.own b{color:var(--ink)}
 <datalist id="dlDur"><option>3 días</option><option>5 días</option><option>7 días</option><option>10 días</option><option>14 días</option><option>1 mes</option><option>hasta nueva indicación</option><option>uso continuo</option></datalist>
 <datalist id="dlSint"><option>dolor</option><option>dolor intenso de inicio súbito</option><option>falta de aire</option><option>náusea o vómito</option><option>agitación o inquietud</option><option>ansiedad o angustia</option><option>secreciones (ruido al respirar)</option><option>convulsiones</option><option>insomnio</option><option>fiebre</option></datalist>
 <datalist id="dlInt"><option>15 minutos</option><option>30 minutos</option><option>1 hora</option><option>2 horas</option><option>4 horas</option><option>6 horas</option><option>8 horas</option></datalist>
+<datalist id="dlNeb"><option>Salbutamol</option><option>Bromuro de ipratropio</option><option>Salbutamol + bromuro de ipratropio</option><option>Budesonida</option><option>Solución salina 0.9 %</option><option>Solución salina hipertónica 3 %</option><option>Acetilcisteína</option></datalist>
 <datalist id="dlSol"><option>Solución salina 0.9 %</option><option>Solución Hartmann</option><option>Solución glucosada 5 %</option><option>Solución glucosada 10 %</option><option>Solución mixta (glucosalina)</option><option>Solución glucosada 5 % + cloruro de sodio</option></datalist>
 
 <script>
@@ -221,6 +222,9 @@ var GEN={
  dom:['Vigilar el estado de alerta, la respiración y el dolor varias veces al día','Anotar diario los síntomas y los rescates que se usaron (registro de síntomas)','Cambios de posición cada 2 horas si pasa la mayor parte del tiempo en cama','Cabecera elevada a 30-45 grados','Vigilar evacuaciones: avisar si pasan 3 días sin evacuar','Vigilar que orine; avisar si pasan 12 horas sin orinar','Cuidar el sitio de la mariposa subcutánea; cambiarla si se enrojece o duele','Prevenir caídas: acompañarlo al levantarse y al ir al baño','Dar los medicamentos a la misma hora todos los días'],
  hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno','Reportar eventualidades']
 };
+var VOL=['Cuenta con documento de voluntad anticipada','No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
+var O2DEV=['Puntas nasales','Mascarilla simple','Mascarilla con reservorio','Mascarilla Venturi','Cánula nasal de alto flujo','Ventilación no invasiva (CPAP / BiPAP)','Otro'];
+var O2MODO=['continuo','sólo si le falta el aire','durante la noche','al hacer esfuerzo o al comer'];
 var CONF=['Cuidado de la boca: humedecer labios y boca con gasa o esponja húmeda varias veces al día','Hidratar la piel con crema y proteger talones, cadera y espalda','Colchón de aire o de presión alterna','Ambiente tranquilo, luz tenue y poco ruido','Acompañamiento de la familia; permitir visitas','Ofrecer líquidos a sorbos sin forzar','Aseo y cambio de pañal frecuentes','Lubricante o gotas en los ojos si no los cierra','Música, oración o lo que le dé tranquilidad','Acompañamiento espiritual según sus creencias','Evitar estudios, piquetes y procedimientos que no le den bienestar'];
 var ALARMA={
  dom:['Dolor que no se quita después de 2 rescates','Falta de aire intensa o respiración muy agitada','Agitación, confusión o alucinaciones','Convulsiones','Vómito que no se controla','Sangrado','No orina en más de 12 horas','Caída o golpe','Si el paciente fallece, para orientarles'],
@@ -262,7 +266,7 @@ function base(){
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
     receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
-    ind:{amb:'dom',fecha:f,hora:ahora(),cuid:'',tel:'',hosp:'',cama:'',exp:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
     def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
@@ -323,8 +327,8 @@ function medCard(base,i,o){
     (m.via==='otra'?fT(p+'.viaO','Escriba la vía',{}):'')+
     fS(p+'.frec','Cada cuánto',FREC,{re:1,c:'w2'})+
     (m.frec==='otra'?fT(p+'.frecO','Escriba cada cuánto',{ph:'p. ej. 8:00, 14:00 y 20:00'}):'')+
-    fT(p+'.dur','Cuánto tiempo',{c:'w2',list:'dlDur',ph:'p. ej. 7 días'})+
-    fT(p+'.para','Para qué es',{c:'w2',list:'dlPara',ph:'p. ej. dolor'})+
+    fT(p+'.dur','Cuánto tiempo',{c:'w2',op:'opcional',list:'dlDur',ph:'p. ej. 7 días'})+
+    (o.sinPara?'':fT(p+'.para','Para qué es',{c:'w2',list:'dlPara',ph:'p. ej. dolor'}))+
     fT(p+'.extra','Indicaciones extra',{c:'w2',op:'opcional',ph:'p. ej. con alimentos; no masticar'})+
     (o.cant?fT(p+'.cant','Cantidad a surtir',{c:'w2',op:'opcional',ph:'p. ej. 1 caja con 20 tabletas'}):'')+
     '</div><div class="warn" id="w_'+p.replace(/\./g,'_')+'">'+esc(avisoMed(m.nom))+'</div></div>';
@@ -333,7 +337,7 @@ function medCard(base,i,o){
 function rescCard(base,i){
   var p=base+'.'+i, r=getP(p);
   return '<div class="item resc"><div class="item-h"><b><span class="no">R'+(i+1)+'</span>Rescate</b><button type="button" class="btn del" data-act="del" data-k="'+base+'" data-i="'+i+'">Quitar</button></div><div class="fields">'+
-    fT(p+'.sint','Si presenta…',{c:'w2',list:'dlSint',ph:'p. ej. dolor'})+
+    fT(p+'.sint','Para qué es (si presenta…)',{c:'w2',list:'dlSint',ph:'p. ej. dolor'})+
     fT(p+'.nom','Dar (medicamento)',{c:'w2',list:'dlMed',ph:'p. ej. Morfina'})+
     fT(p+'.dosis','Dosis',{ph:'p. ej. 2.5 mg'})+
     fS(p+'.via','Cómo se aplica',VIAS,{re:1,c:'w2'})+
@@ -365,23 +369,33 @@ VIEW.receta=function(){ var r=S.receta;
 VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
   var h='<div class="card"><h3>¿Dónde está el paciente?</h3>'+chips('ind.amb',[['dom','En su domicilio'],['hosp','Hospitalizado']],'seg')+'</div>'+ptCard(true)+
   '<div class="card"><h3>Datos de la hoja</h3><div class="fields">'+fT('ind.fecha','Fecha',{type:'date'})+fT('ind.hora','Hora',{type:'time'})+
-    (dom?fT('ind.cuid','Cuidador principal',{c:'w2',op:'opcional'})+fT('ind.tel','Teléfono del cuidador',{type:'tel',im:'tel',op:'opcional'})
-        :fT('ind.hosp','Hospital y servicio',{c:'w2',op:'opcional'})+fT('ind.cama','Cama',{op:'opcional'})+fT('ind.exp','Expediente',{op:'opcional'}))+'</div></div>'+
+    fT('ind.ciudad','Ciudad',{c:'w2',ph:'p. ej. Guadalajara, Jalisco'})+
+    (dom?'':fT('ind.hosp','Hospital y servicio',{c:'w2',op:'opcional'})+fT('ind.cama','Cama',{op:'opcional'}))+'</div></div>'+
+  '<div class="card"><h3>Voluntades anticipadas</h3><p class="hint">Lo que marque sale en un recuadro al inicio del PDF para que '+(dom?'la familia y los cuidadores':'el personal de enfermería')+' lo tenga presente.</p>'+checks('ind.vol',VOL)+
+    '<div class="fields" style="margin-top:6px">'+fT('ind.volRep','Representante o persona que decide',{c:'w4',op:'opcional',ph:'p. ej. Ana López (hija)'})+fA('ind.volO','Otras voluntades',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>1. Dieta</h3><p class="hint">Toque una opción.</p>'+chips('ind.dieta',DIETAS)+(d.dieta==='Otra'?'<div class="fields" style="margin-top:10px">'+fT('ind.dietaO','Escriba la dieta',{c:'w4'})+'</div>':'')+'</div>'+
   '<div class="card"><h3>2. Soluciones</h3><p class="hint">'+(d.sol.length?'':'Si no lleva soluciones, déjelo así: en el PDF dirá «Sin soluciones».')+'</p>'+
     d.sol.map(function(s,i){ var p='ind.sol.'+i; return '<div class="item"><div class="item-h"><b><span class="no">'+(i+1)+'</span>Solución</b><button type="button" class="btn del" data-act="del" data-k="ind.sol" data-i="'+i+'">Quitar</button></div><div class="fields">'+
       fT(p+'.tipo','Solución',{c:'w2',list:'dlSol',ph:'p. ej. Solución salina 0.9 %'})+fT(p+'.vol','Volumen',{ph:'p. ej. 1000 mL'})+
       fS(p+'.via','Vía',['intravenosa','subcutánea (hipodermoclisis)'])+fT(p+'.tiempo','Para pasar en',{ph:'p. ej. 24 horas'})+fT(p+'.extra','Agregar / nota',{op:'opcional',ph:'p. ej. + 20 mEq KCl'})+'</div></div>'; }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="ind.sol">+ Agregar solución</button></div>'+
-  '<div class="card"><h3>3. Medicamentos</h3>'+d.meds.map(function(m,i){ return medCard('ind.meds',i,{}); }).join('')+
+  '<div class="card"><h3>3. Inhaloterapia</h3><p class="hint">Oxígeno y nebulizaciones. Si no lleva, déjelo vacío.</p><div class="fields">'+
+    fS('ind.o2dev','Oxígeno: dispositivo',O2DEV,{c:'w2',re:1})+
+    (d.o2dev?fT('ind.o2flujo','Flujo',{ph:'p. ej. 2 L/min'})+(d.o2dev==='Mascarilla Venturi'||/alto flujo|CPAP/.test(d.o2dev)?fT('ind.o2fio2','FiO2 / parámetros',{ph:'p. ej. 28 %'}):'')+
+      fS('ind.o2modo','Cuándo',O2MODO,{c:'w2'})+fT('ind.o2meta','Meta de saturación',{op:'opcional',ph:'p. ej. 88-92 %'})+fT('ind.o2nota','Nota',{c:'w4',op:'opcional',ph:'p. ej. humidificar; retirar si le incomoda'}):'')+'</div>'+
+    d.neb.map(function(n,i){ var p='ind.neb.'+i; return '<div class="item"><div class="item-h"><b><span class="no">'+(i+1)+'</span>Nebulización</b><button type="button" class="btn del" data-act="del" data-k="ind.neb" data-i="'+i+'">Quitar</button></div><div class="fields">'+
+      fT(p+'.med','Medicamento',{c:'w2',list:'dlNeb',ph:'p. ej. Salbutamol'})+fT(p+'.dosis','Dosis',{ph:'p. ej. 2.5 mg (0.5 mL)'})+fT(p+'.dil','Diluir en',{ph:'p. ej. 3 mL de solución salina'})+
+      fT(p+'.frec','Cada cuánto',{c:'w2',ph:'p. ej. cada 6 horas'})+fS(p+'.con','Nebulizar con',['oxígeno','aire'],{c:'w2'})+'</div></div>'; }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="ind.neb">+ Agregar nebulización</button></div>'+
+  '<div class="card"><h3>4. Medicamentos</h3>'+d.meds.map(function(m,i){ return medCard('ind.meds',i,{sinPara:!dom}); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="ind.meds">+ Agregar medicamento</button></div>'+
-  '<div class="card"><h3>4. Medicamentos de rescate</h3>'+d.resc.map(function(m,i){ return rescCard('ind.resc',i); }).join('')+
+  '<div class="card"><h3>5. Medicamentos de rescate</h3>'+d.resc.map(function(m,i){ return rescCard('ind.resc',i); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="ind.resc">+ Agregar rescate</button></div>'+
-  '<div class="card"><h3>5. Medidas generales</h3>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
-  '<div class="card"><h3>6. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
-  '<div class="card"><h3>7. '+(dom?'Llamar a la doctora si…':'Avisar al médico si…')+'</h3>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
-  (dom?'':'<div class="card"><h3>8. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
-  '<div class="card"><h3>'+(dom?'8':'9')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
+  '<div class="card"><h3>6. Medidas generales</h3>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>7. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>8. '+(dom?'Llamar a la doctora si…':'Avisar al médico si…')+'</h3>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
+  (dom?'':'<div class="card"><h3>9. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
+  '<div class="card"><h3>'+(dom?'9':'10')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
   return h;
 };
 VIEW.cons=function(){ var c=S.cons, fam=c.para.indexOf('fam')===0;
@@ -552,7 +566,7 @@ document.addEventListener('click',function(e){
   if(a==='pdf'){ generar(); return; }
   if(a==='set'){ setP(k,v); renderMod(true); return; }
   if(a==='fill'){ setP(k,v); if(cur) renderMod(true); else renderHome(); return; }
-  if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:nuevoMed()); guardar(); renderMod(true);
+  if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:/neb$/.test(k)?{med:'',dosis:'',dil:'',frec:'',con:''}:nuevoMed()); guardar(); renderMod(true);
     var items=$('modBody').querySelectorAll('[data-k^="'+k+'.'+(arr.length-1)+'."]'); if(items[0]){ items[0].scrollIntoView({block:'center'}); try{ items[0].focus({preventScroll:true}); }catch(x){} } return; }
   if(a==='del'){ getP(k).splice(+b.getAttribute('data-i'),1); guardar(); renderMod(true); return; }
   if(a==='editar'){ var o=S[k]; o.texto=k==='cons'?textoCons():textoDef(); if(k==='cons') o.textoEn=textoConsEn(); o.edit=true; guardar(); renderMod(true); return; }
@@ -725,6 +739,19 @@ function bloqueTexto(G,t,o){ String(t||'').split(/\n\s*\n/).forEach(function(par
   G.parrafo(segs,{size:o&&o.size||10.8,lead:o&&o.lead||16}); G.y+=8; }); }
 function lineas(t){ return String(t||'').split('\n').map(trim).filter(Boolean); }
 
+/* recuadro de voluntades anticipadas, al inicio de las indicaciones */
+function cuadroVol(G,vol,rep,dom){
+  var d=G.d, C=G.C, X0=G.X0, X1=G.X1, W=X1-X0, iw=W-30, size=9.8, lead=12.8;
+  var L=vol.map(function(v){ return G.env([{t:v}],size,iw); });
+  var pie=G.env([{t:(rep?'Representante: ':''),b:1,c:C.RES},{t:(rep?rep+'.  ':'')},{t:dom?'Enterados la familia y los cuidadores.':'Enterado el personal de enfermería y el equipo de salud.',i:1}],9,iw);
+  var h=24+L.reduce(function(a,l){ return a+l.length*lead+2; },0)+pie.length*12+8;
+  G.hay(h+8); var y0=G.y;
+  G.col(C.RESBG,'setFillColor'); G.col(C.RES,'setDrawColor'); d.setLineWidth(1); d.roundedRect(X0,y0,W,h,5,5,'FD');
+  G.fnt('bold',9.4,C.RES); G.txt('VOLUNTADES ANTICIPADAS',X0+12,y0+15);
+  var y=y0+24; L.forEach(function(ls){ G.col(C.RES,'setFillColor'); d.circle(X0+16,y+4.6,1.8,'F'); ls.forEach(function(ln){ G.pintar(ln,X0+24,y+size*0.8,size); y+=lead; }); y+=2; });
+  pie.forEach(function(ln){ G.pintar(ln,X0+12,y+8,9,C.GRAY); y+=12; });
+  G.y=y0+h+8;
+}
 var PDF={};
 PDF.receta=function(){ var r=S.receta, G=hoja('RECETA MÉDICA',fCorta(r.fecha));
   pacCeldas(G);
@@ -738,17 +765,24 @@ PDF.receta=function(){ var r=S.receta, G=hoja('RECETA MÉDICA',fCorta(r.fecha));
 PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICAS',fCorta(o.fecha)+(o.hora?' '+o.hora:''));
   G.titulo(dom?'Indicaciones médicas en domicilio':'Indicaciones médicas hospitalarias',dom?'Medicina del Dolor y Cuidados Paliativos':(trim(o.hosp)||'Medicina del Dolor y Cuidados Paliativos'));
   pacCeldas(G);
-  if(dom&&(trim(o.cuid)||trim(o.tel))) G.celdas([['Cuidador principal',o.cuid,0.65],['Teléfono',o.tel,0.35]]);
-  if(!dom&&(trim(o.cama)||trim(o.exp))) G.celdas([['Cama',o.cama,0.3],['Expediente',o.exp,0.7]]);
+  G.celdas([['Ciudad',o.ciudad,0.7],['Cama',dom?'':o.cama,0.3]]);
+  var vol=VOL.filter(function(x){ return o.vol.indexOf(x)>=0; }).concat(lineas(o.volO));
+  if(vol.length||trim(o.volRep)) cuadroVol(G,vol,trim(o.volRep),dom);
   var n=0, sec=function(t){ n++; G.banda(n+'. '+t); };
   sec('Dieta'); G.parrafo([{t:o.dieta==='Otra'?(trim(o.dietaO)||'—'):(o.dieta||'—'),b:1}],{size:10.6}); G.y+=6;
   sec('Soluciones'); var sol=o.sol.filter(function(s){ return trim(s.tipo); });
   if(!sol.length) G.li('Sin soluciones.'); else sol.forEach(function(s){ G.li([{t:trim(s.tipo)+(trim(s.vol)?' '+trim(s.vol):''),b:1},{t:(s.via?', vía '+s.via:'')+(trim(s.tiempo)?', para pasar en '+trim(s.tiempo):'')+(trim(s.extra)?'. '+trim(s.extra):'')+'.'}]); });
   G.y+=4;
+  sec('Inhaloterapia'); var neb=o.neb.filter(function(x){ return trim(x.med); });
+  if(o.o2dev){ var dev=o.o2dev==='Otro'?'':' por '+low1(o.o2dev);
+    G.li([{t:'Oxígeno'+dev,b:1},{t:(trim(o.o2flujo)?' a '+trim(o.o2flujo):'')+(trim(o.o2fio2)?', FiO2 '+trim(o.o2fio2):'')+(o.o2modo?', '+o.o2modo:'')+'.'+(trim(o.o2meta)?' Meta de saturación: '+trim(o.o2meta)+'.':'')+(trim(o.o2nota)?' '+trim(o.o2nota):'')}]); }
+  neb.forEach(function(x){ G.li([{t:'Nebulización con '+trim(x.med)+(trim(x.dosis)?' '+trim(x.dosis):''),b:1},{t:(trim(x.dil)?', diluido en '+trim(x.dil):'')+(trim(x.frec)?', '+trim(x.frec):'')+(x.con?', con '+x.con:'')+'.'}]); });
+  if(!o.o2dev&&!neb.length) G.li('Sin inhaloterapia.');
+  G.y+=4;
   sec('Medicamentos'); var meds=o.meds.filter(function(m){ return trim(m.nom); });
   if(!meds.length) G.li('Sin medicamentos.');
   else if(dom) meds.forEach(function(m,i){ tarjetaMed(G,m,i+1); });
-  else meds.forEach(function(m){ G.li([{t:trim(m.nom)+(trim(m.pres)?' '+trim(m.pres):''),b:1},{t:': '+[trim(m.dosis),via(m),frec(m)].filter(Boolean).join(', ')+(trim(m.dur)?', durante '+trim(m.dur):'')+(trim(m.para)?' ('+trim(m.para)+')':'')+(trim(m.extra)?'. '+trim(m.extra):'')+'.'}]); });
+  else meds.forEach(function(m){ G.li([{t:trim(m.nom)+(trim(m.pres)?' '+trim(m.pres):''),b:1},{t:': '+[trim(m.dosis),via(m),frec(m)].filter(Boolean).join(', ')+(trim(m.dur)?', durante '+trim(m.dur):'')+(trim(m.extra)?'. '+trim(m.extra):'')+'.'}]); });
   G.y+=4;
   var resc=o.resc.filter(function(m){ return trim(m.nom); });
   sec('Medicamentos de rescate'); if(!resc.length) G.li('Sin rescates indicados.'); else resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); });
