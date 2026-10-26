@@ -220,11 +220,16 @@ var FREC=['cada 4 horas','cada 6 horas','cada 8 horas','cada 12 horas','cada 24 
 var DIETAS=['Ayuno','Líquidos claros','Dieta líquida completa','Dieta blanda','Dieta en papilla / licuada','Dieta normal a tolerancia','Dieta de confort (lo que desee y tolere)','Dieta para diabético','Dieta baja en sal','Alimentación por sonda','Otra'];
 var GEN={
  dom:['Vigilar el estado de alerta, la respiración y el dolor varias veces al día','Anotar diario los síntomas y los rescates que se usaron (registro de síntomas)','Cambios de posición cada 2 horas si pasa la mayor parte del tiempo en cama','Cabecera elevada a 30-45 grados','Vigilar evacuaciones: avisar si pasan 3 días sin evacuar','Vigilar que orine; avisar si pasan 12 horas sin orinar','Cuidar el sitio de la mariposa subcutánea; cambiarla si se enrojece o duele','Prevenir caídas: acompañarlo al levantarse y al ir al baño','Dar los medicamentos a la misma hora todos los días'],
- hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno','Reportar eventualidades']
+ hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno']
 };
-var VOL=['Cuenta con documento de voluntad anticipada','No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
+var VOLTIPO=['Expresadas verbalmente','Firmadas en documento de voluntad anticipada','Firmadas ante notario'];
+var VOL=['No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
 var O2DEV=['Puntas nasales','Mascarilla simple','Mascarilla con reservorio','Mascarilla Venturi','Cánula nasal de alto flujo','Ventilación no invasiva (CPAP / BiPAP)','Otro'];
 var O2MODO=['continuo','sólo si le falta el aire','durante la noche','al hacer esfuerzo o al comer'];
+var FALLECE={
+ dom:['No llamar a la ambulancia ni iniciar maniobras de reanimación, de acuerdo con sus voluntades','Mantener la calma, acompañarlo y despedirse con tranquilidad','Anotar la hora aproximada del fallecimiento','Llamar a la Dra. Gabriela López Ortiz para constatar el fallecimiento y elaborar el certificado de defunción','No retirar parches, sondas ni mariposa hasta que la médica lo indique','Acostarlo boca arriba, con una almohada bajo la cabeza, y cerrarle ojos y boca','Tener a la mano la identificación oficial (INE) y la CURP del paciente','Llamar a la funeraria de su elección cuando se tenga el certificado de defunción','Si acude la policía u otra autoridad, mostrar el parte médico y estas indicaciones','Entregar a la doctora los medicamentos controlados que sobren (opioides) para su desecho seguro'],
+ hosp:['No iniciar maniobras de reanimación, de acuerdo con sus voluntades','Permitir el acompañamiento de la familia en todo momento','Notificar al médico de guardia para constatar el fallecimiento y elaborar el certificado de defunción','Avisar a la Dra. Gabriela Alejandra López Ortiz','Cuidados post mortem por enfermería','Entregar pertenencias a la familia y orientarla sobre los trámites']
+};
 var CONF=['Cuidado de la boca: humedecer labios y boca con gasa o esponja húmeda varias veces al día','Hidratar la piel con crema y proteger talones, cadera y espalda','Colchón de aire o de presión alterna','Ambiente tranquilo, luz tenue y poco ruido','Acompañamiento de la familia; permitir visitas','Ofrecer líquidos a sorbos sin forzar','Aseo y cambio de pañal frecuentes','Lubricante o gotas en los ojos si no los cierra','Música, oración o lo que le dé tranquilidad','Acompañamiento espiritual según sus creencias','Evitar estudios, piquetes y procedimientos que no le den bienestar'];
 var ALARMA={
  dom:['Dolor que no se quita después de 2 rescates','Falta de aire intensa o respiración muy agitada','Agitación, confusión o alucinaciones','Convulsiones','Vómito que no se controla','Sangrado','No orina en más de 12 horas','Caída o golpe','Si el paciente fallece, para orientarles'],
@@ -266,7 +271,7 @@ function base(){
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
     receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
-    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
     def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
@@ -371,7 +376,7 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
   '<div class="card"><h3>Datos de la hoja</h3><div class="fields">'+fT('ind.fecha','Fecha',{type:'date'})+fT('ind.hora','Hora',{type:'time'})+
     fT('ind.ciudad','Ciudad',{c:'w2',ph:'p. ej. Guadalajara, Jalisco'})+
     (dom?'':fT('ind.hosp','Hospital y servicio',{c:'w2',op:'opcional'})+fT('ind.cama','Cama',{op:'opcional'}))+'</div></div>'+
-  '<div class="card"><h3>Voluntades anticipadas</h3><p class="hint">Lo que marque sale en un recuadro al inicio del PDF para que '+(dom?'la familia y los cuidadores':'el personal de enfermería')+' lo tenga presente.</p>'+checks('ind.vol',VOL)+
+  '<div class="card"><h3>Voluntades anticipadas</h3><p class="hint">Lo que marque sale en un recuadro al inicio del PDF para que '+(dom?'la familia y los cuidadores':'el personal de enfermería')+' lo tenga presente.</p>'+'<p class="hint" style="margin:4px 0 6px">¿Cómo las expresó?</p>'+chips('ind.volTipo',VOLTIPO)+'<p class="hint" style="margin:12px 0 4px">¿Qué decidió?</p>'+checks('ind.vol',VOL)+
     '<div class="fields" style="margin-top:6px">'+fT('ind.volRep','Representante o persona que decide',{c:'w4',op:'opcional',ph:'p. ej. Ana López (hija)'})+fA('ind.volO','Otras voluntades',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>1. Dieta</h3><p class="hint">Toque una opción.</p>'+chips('ind.dieta',DIETAS)+(d.dieta==='Otra'?'<div class="fields" style="margin-top:10px">'+fT('ind.dietaO','Escriba la dieta',{c:'w4'})+'</div>':'')+'</div>'+
   '<div class="card"><h3>2. Soluciones</h3><p class="hint">'+(d.sol.length?'':'Si no lleva soluciones, déjelo así: en el PDF dirá «Sin soluciones».')+'</p>'+
@@ -393,9 +398,14 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
     '<button type="button" class="btn add" data-act="add" data-k="ind.resc">+ Agregar rescate</button></div>'+
   '<div class="card"><h3>6. Medidas generales</h3>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>7. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
-  '<div class="card"><h3>8. '+(dom?'Llamar a la doctora si…':'Avisar al médico si…')+'</h3>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
-  (dom?'':'<div class="card"><h3>9. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
-  '<div class="card"><h3>'+(dom?'9':'10')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
+  '<div class="card"><h3>8. Informar eventualidades</h3><p class="hint">'+(dom?'A quién llamar si pasa algo fuera de lo esperado.':'A quién avisar de cualquier eventualidad.')+'</p><div class="fields">'+
+    fT('ind.evtA',dom?'Llamar a':'Informar a',{c:'w2'})+fT('ind.evtTel','Teléfono',{c:'w2',type:'tel',im:'tel'})+'</div>'+
+    '<p class="hint" style="margin:12px 0 4px">'+(dom?'Llamar sobre todo si…':'Avisar sobre todo si…')+'</p>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
+  '<div class="card"><h3>9. En caso de fallecimiento</h3><p class="hint">Para el paciente que no acepta maniobras de reanimación y tiene riesgo de fallecer. Marque las recomendaciones que apliquen.</p>'+
+    '<button type="button" class="btn ghost sm" data-act="todas" data-k="ind.fallece" style="margin-bottom:6px">Marcar todas</button>'+checks('ind.fallece',FALLECE[d.amb])+
+    '<div class="fields" style="margin-top:6px">'+fA('ind.falleceO','Otras recomendaciones',{op:'opcional',rows:2})+'</div></div>'+
+  (dom?'':'<div class="card"><h3>10. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
+  '<div class="card"><h3>'+(dom?'10':'11')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
   return h;
 };
 VIEW.cons=function(){ var c=S.cons, fam=c.para.indexOf('fam')===0;
@@ -569,6 +579,7 @@ document.addEventListener('click',function(e){
   if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:/neb$/.test(k)?{med:'',dosis:'',dil:'',frec:'',con:''}:nuevoMed()); guardar(); renderMod(true);
     var items=$('modBody').querySelectorAll('[data-k^="'+k+'.'+(arr.length-1)+'."]'); if(items[0]){ items[0].scrollIntoView({block:'center'}); try{ items[0].focus({preventScroll:true}); }catch(x){} } return; }
   if(a==='del'){ getP(k).splice(+b.getAttribute('data-i'),1); guardar(); renderMod(true); return; }
+  if(a==='todas'){ setP(k,FALLECE[S.ind.amb].slice()); renderMod(true); return; }
   if(a==='editar'){ var o=S[k]; o.texto=k==='cons'?textoCons():textoDef(); if(k==='cons') o.textoEn=textoConsEn(); o.edit=true; guardar(); renderMod(true); return; }
   if(a==='regen'){ S[k].edit=false; guardar(); renderMod(true); return; }
   if(a==='txReceta'){ S.res.tx=S.receta.meds.filter(function(m){ return trim(m.nom); }).map(function(m){ return lineaMed(m); }).join('\n'); guardar(); renderMod(true); return; }
@@ -740,9 +751,10 @@ function bloqueTexto(G,t,o){ String(t||'').split(/\n\s*\n/).forEach(function(par
 function lineas(t){ return String(t||'').split('\n').map(trim).filter(Boolean); }
 
 /* recuadro de voluntades anticipadas, al inicio de las indicaciones */
-function cuadroVol(G,vol,rep,dom){
+function cuadroVol(G,vol,rep,dom,tipo){
   var d=G.d, C=G.C, X0=G.X0, X1=G.X1, W=X1-X0, iw=W-30, size=9.8, lead=12.8;
   var L=vol.map(function(v){ return G.env([{t:v}],size,iw); });
+  if(tipo) L.unshift(G.env([{t:'Voluntades: ',b:1,c:C.RES},{t:low1(tipo)+'.',b:1}],size,iw));
   var pie=G.env([{t:(rep?'Representante: ':''),b:1,c:C.RES},{t:(rep?rep+'.  ':'')},{t:dom?'Enterados la familia y los cuidadores.':'Enterado el personal de enfermería y el equipo de salud.',i:1}],9,iw);
   var h=24+L.reduce(function(a,l){ return a+l.length*lead+2; },0)+pie.length*12+8;
   G.hay(h+8); var y0=G.y;
@@ -767,7 +779,7 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
   pacCeldas(G);
   G.celdas([['Ciudad',o.ciudad,0.7],['Cama',dom?'':o.cama,0.3]]);
   var vol=VOL.filter(function(x){ return o.vol.indexOf(x)>=0; }).concat(lineas(o.volO));
-  if(vol.length||trim(o.volRep)) cuadroVol(G,vol,trim(o.volRep),dom);
+  if(vol.length||trim(o.volRep)||o.volTipo) cuadroVol(G,vol,trim(o.volRep),dom,o.volTipo);
   var n=0, sec=function(t){ n++; G.banda(n+'. '+t); };
   sec('Dieta'); G.parrafo([{t:o.dieta==='Otra'?(trim(o.dietaO)||'—'):(o.dieta||'—'),b:1}],{size:10.6}); G.y+=6;
   sec('Soluciones'); var sol=o.sol.filter(function(s){ return trim(s.tipo); });
@@ -792,8 +804,12 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
   var conf=CONF.filter(function(x){ return o.conf.indexOf(x)>=0; }).concat(lineas(o.confO));
   if(conf.length){ sec('Medidas de confort'); conf.forEach(function(x){ G.li(x); }); G.y+=4; }
   var al=ALARMA[o.amb].filter(function(x){ return o.alarma.indexOf(x)>=0; });
-  if(al.length){ sec(dom?'Llamar a la doctora si...':'Avisar al médico si...'); al.forEach(function(x){ G.li(x); });
-    if(dom){ G.y+=2; G.parrafo([{t:'Urgencias: 311 204 87 63',b:1,c:G.C.PLUM},{t:'   ·   Citas por WhatsApp: 33 4480 1259'}]); } G.y+=4; }
+  if(al.length||trim(o.evtA)||trim(o.evtTel)){ sec('Informar eventualidades');
+    G.parrafo([{t:(dom?'Ante cualquier eventualidad, llamar a ':'Informar cualquier eventualidad a ')},{t:trim(o.evtA)||'la médica tratante',b:1,c:G.C.PLUM},{t:trim(o.evtTel)?' al teléfono ':''},{t:trim(o.evtTel),b:1,c:G.C.PLUM},{t:'.'}]); G.y+=3;
+    if(al.length){ G.parrafo([{t:dom?'Llamar sobre todo si:':'Avisar sobre todo si:',b:1}],{size:9.6}); G.y+=1; al.forEach(function(x){ G.li(x); }); }
+    G.y+=4; }
+  var fa=FALLECE[o.amb].filter(function(x){ return o.fallece.indexOf(x)>=0; }).concat(lineas(o.falleceO));
+  if(fa.length){ sec('En caso de fallecimiento'); fa.forEach(function(x){ G.li(x); }); G.y+=4; }
   if(!dom&&trim(o.estudios)){ sec('Estudios e interconsultas'); lineas(o.estudios).forEach(function(x){ G.li(x); }); G.y+=4; }
   if(trim(o.otras)){ sec('Otras indicaciones'); lineas(o.otras).forEach(function(x){ G.li(x); }); }
   G.firma(); return G.fin();
