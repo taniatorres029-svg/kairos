@@ -160,6 +160,7 @@ footer.own b{color:var(--ink)}
   <section class="sec" aria-labelledby="ptH">
     <div class="sec-h"><h2 id="ptH"><span class="n">1</span>Datos del paciente</h2><p>Se escriben una vez y pasan solos a todos los documentos.</p></div>
     <div id="ptHome"></div>
+    <div id="guardados"></div>
   </section>
 
   <section class="sec" aria-labelledby="mnH">
@@ -221,8 +222,10 @@ var DIETAS=['Ayuno','Líquidos claros','Dieta líquida completa','Dieta blanda',
 var ACTIV=['Reposo absoluto en cama','Reposo relativo','Reposo en cama con cabecera elevada','Puede sentarse en sillón','Deambulación asistida','Deambulación libre','Actividad a tolerancia','Movilización pasiva por cuidador / enfermería'];
 var GEN={
  dom:['Vigilar el estado de alerta, la respiración y el dolor varias veces al día','Anotar diario los síntomas y los rescates que se usaron (registro de síntomas)','Cambios de posición cada 2 horas si pasa la mayor parte del tiempo en cama','Cabecera elevada a 30-45 grados','Vigilar evacuaciones: avisar si pasan 3 días sin evacuar','Vigilar que orine; avisar si pasan 12 horas sin orinar','Cuidar el sitio de la mariposa subcutánea; cambiarla si se enrojece o duele','Prevenir caídas: acompañarlo al levantarse y al ir al baño','Dar los medicamentos a la misma hora todos los días'],
- hosp:['Signos vitales por turno','Control de líquidos (ingresos y egresos)','Glucosa capilar cada 8 horas','Cuidados generales de enfermería','Barandales arriba y prevención de caídas','Cambios de posición cada 2 horas','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea','Escala de dolor por turno']
+ hosp:['Signos vitales (presión arterial, frecuencia cardiaca y respiratoria, temperatura y saturación) por turno','Control de líquidos (ingresos y egresos) y uresis por turno','Peso diario en ayuno, con la misma báscula','Glucosa capilar antes de cada comida y a las 22 h','Escala de dolor por turno','Cabecera elevada a 30-45 grados','Cuidados de vía venosa / subcutánea; retirar catéteres que ya no se necesiten','Retirar la sonda vesical en cuanto sea posible','Vigilar evacuaciones; avisar si pasan 3 días sin evacuar','Cuidados generales de enfermería']
 };
+var GER=['Prevención de delirium: orientarlo en tiempo y lugar cada turno, con reloj y calendario a la vista','Respetar el sueño: luz apagada y sin tomas de signos ni medicamentos innecesarios de 23 a 6 h','Lentes, aparatos auditivos y prótesis dental a su alcance','Vigilar delirium por turno (CAM); avisar si hay un cambio brusco en la atención o el estado de alerta','Evitar la sujeción física; si es indispensable, con indicación médica y revaloración cada 2 horas','Prevención de caídas: barandales arriba, cama baja, timbre a la mano y calzado antiderrapante; levantarlo siempre acompañado','Movilización temprana: sentarlo en el sillón y caminar acompañado 3 veces al día, si su estado lo permite','Cambios de posición cada 2 horas y escala de Braden por turno','Precauciones de aspiración: sentado a 90 grados para comer; valorar la deglución antes de iniciar la vía oral','Higiene bucal 3 veces al día','Profilaxis de trombosis según riesgo (Padua) y riesgo de sangrado','Conciliación de medicamentos: revisar polifarmacia y suspender los potencialmente inapropiados (criterios STOPP / Beers)','Evitar benzodiacepinas, anticolinérgicos y antihistamínicos de primera generación','Acompañamiento de un familiar las 24 horas para orientación y apoyo','Planear el egreso desde el ingreso: cuidador, equipo en casa (cama, oxígeno, silla) y seguimiento'];
+var LAB=['Biometría hemática','Química sanguínea (glucosa, urea, creatinina)','Electrolitos séricos (Na, K, Cl, Ca, Mg, P)','Pruebas de función hepática','Albúmina','Tiempos de coagulación','Examen general de orina','Gasometría','Radiografía de tórax','Electrocardiograma'];
 var VOLTIPO=['Expresadas verbalmente','Firmadas en documento de voluntad anticipada','Firmadas ante notario'];
 var VOL=['No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
 var O2DEV=['Puntas nasales','Mascarilla simple','Mascarilla con reservorio','Mascarilla Venturi','Cánula nasal de alto flujo','Ventilación no invasiva (CPAP / BiPAP)','Otro'];
@@ -234,7 +237,7 @@ var FALLECE={
 var CONF=['Cuidado de la boca: humedecer labios y boca con gasa o esponja húmeda varias veces al día','Hidratar la piel con crema y proteger talones, cadera y espalda','Colchón de aire o de presión alterna','Ambiente tranquilo, luz tenue y poco ruido','Acompañamiento de la familia; permitir visitas','Ofrecer líquidos a sorbos sin forzar','Aseo y cambio de pañal frecuentes','Lubricante o gotas en los ojos si no los cierra','Música, oración o lo que le dé tranquilidad','Acompañamiento espiritual según sus creencias','Evitar estudios, piquetes y procedimientos que no le den bienestar'];
 var ALARMA={
  dom:['Dolor que no se quita después de 2 rescates','Falta de aire intensa o respiración muy agitada','Agitación, confusión o alucinaciones','Convulsiones','Vómito que no se controla','Sangrado','No orina en más de 12 horas','Caída o golpe','Si el paciente fallece, para orientarles'],
- hosp:['Dolor mayor de 4/10 después del rescate','Saturación menor de 90 %','Presión arterial sistólica menor de 90 mmHg','Agitación o delirium','Sangrado','Uresis menor de 0.5 mL/kg/h']
+ hosp:['Dolor mayor de 4/10 después del rescate','Saturación menor de 90 %','Presión arterial sistólica menor de 90 mmHg','Frecuencia cardiaca mayor de 120 o menor de 50 por minuto','Frecuencia respiratoria mayor de 24 por minuto','Temperatura de 38 °C o más','Glucosa capilar menor de 70 o mayor de 300 mg/dL','Cambio brusco en el estado de alerta o la conducta (delirium)','Caída','Sangrado','Uresis menor de 0.5 mL/kg/h']
 };
 var ESTADO=[['avanzada','cursa con una enfermedad avanzada, progresiva e incurable','has an advanced, progressive and incurable illness'],
  ['final','se encuentra en la etapa final de la vida','is in the final stage of life'],
@@ -272,7 +275,7 @@ function base(){
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
     receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
-    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],alarmaO:'',activ:'',estudios:'',otras:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',ger:[],lab:[],dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],alarmaO:'',activ:'',estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
     def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
@@ -291,6 +294,26 @@ function cargar(){
 }
 var tGuardar=null;
 function guardar(){ clearTimeout(tGuardar); tGuardar=setTimeout(function(){ ss('docs_state',JSON.stringify(S)); },250); }
+/* Recetas e indicaciones guardadas por paciente, sólo en este dispositivo. Se borran solas a los 60 días sin usarse. */
+var GK='kairos_docs_pacientes_v1', DIAS_GUARDA=60;
+function lsG(v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem(GK)||'{}')||{}; localStorage.setItem(GK,JSON.stringify(v)); }catch(e){ return {}; } }
+function claveP(n){ return String(n||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' '); }
+function purgar(){ var G=lsG(), lim=Date.now()-DIAS_GUARDA*864e5, cam=false; Object.keys(G).forEach(function(k){ if(!G[k]||!(G[k].t>lim)){ delete G[k]; cam=true; } }); if(cam) lsG(G); return G; }
+function guardarPac(doc){ var k=claveP(S.pt.nombre); if(!k||(doc!=='receta'&&doc!=='ind')) return; var G=purgar(), e=G[k]||{docs:{}};
+  e.nombre=trim(S.pt.nombre); e.pt=JSON.parse(JSON.stringify(S.pt)); e.docs=e.docs||{}; e.docs[doc]={v:JSON.parse(JSON.stringify(S[doc])),t:Date.now()}; e.t=Date.now(); G[k]=e; lsG(G); }
+function abrirPac(k){ var G=purgar(), e=G[k]; if(!e) return; var b=base();
+  Object.keys(b.pt).forEach(function(j){ if(e.pt&&e.pt[j]!==undefined) b.pt[j]=e.pt[j]; }); S.pt=b.pt;
+  ['receta','ind'].forEach(function(d){ var o=b[d]; if(e.docs&&e.docs[d]){ var v=e.docs[d].v||{}; Object.keys(o).forEach(function(j){ if(v[j]!==undefined) o[j]=v[j]; }); o.fecha=hoyISO(); if(d==='ind') o.hora=ahora(); } S[d]=o; });
+  e.t=Date.now(); G[k]=e; lsG(G); guardar(); }
+function fCh(t){ var d=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear(); }
+function renderGuardados(){ var el=$('guardados'); if(!el) return; var G=purgar(), ks=Object.keys(G).sort(function(a,b){ return G[b].t-G[a].t; });
+  if(!ks.length){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="card"><h3>Pacientes con recetas o indicaciones guardadas</h3><p class="hint">Toque un nombre para cargar su última receta e indicaciones y modificarlas. Se guardan sólo en este dispositivo y se borran solas si pasan '+DIAS_GUARDA+' días sin usarse.</p>'+
+    (ks.length>6?'<div class="fields"><label class="f w4">Buscar paciente<input type="search" id="gBus" autocomplete="off" placeholder="Escriba parte del nombre"></label></div>':'')+
+    '<div id="gLista">'+ks.map(function(k){ var e=G[k], dd=[]; if(e.docs.receta) dd.push('receta '+fCh(e.docs.receta.t)); if(e.docs.ind) dd.push('indicaciones '+fCh(e.docs.ind.t));
+      return '<div class="item gp" data-n="'+esc(k)+'" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn ghost" data-act="abrirPac" data-v="'+esc(k)+'" style="flex:1 1 200px;text-align:left;justify-content:flex-start"><span><b>'+esc(e.nombre)+'</b><br><small style="font-weight:400;color:var(--muted)">'+esc(dd.join(' · '))+'</small></span></button><button type="button" class="btn ghost sm" data-act="borrarPac" data-v="'+esc(k)+'">Borrar</button></div>'; }).join('')+'</div></div>';
+  var bu=$('gBus'); if(bu) bu.oninput=function(){ var q=claveP(bu.value), it=el.querySelectorAll('.gp'); for(var i=0;i<it.length;i++) it[i].hidden=q&&it[i].getAttribute('data-n').indexOf(q)<0; };
+}
 function getP(p){ var o=S, k=p.split('.'); for(var i=0;i<k.length;i++){ if(o==null) return ''; o=o[k[i]]; } return o==null?'':o; }
 function setP(p,v){ var o=S, k=p.split('.'); for(var i=0;i<k.length-1;i++) o=o[k[i]]; o[k[k.length-1]]=v; guardar(); }
 
@@ -397,7 +420,7 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
     '<button type="button" class="btn add" data-act="add" data-k="ind.meds">+ Agregar medicamento</button></div>'+
   '<div class="card"><h3>5. Medicamentos de rescate</h3>'+d.resc.map(function(m,i){ return rescCard('ind.resc',i); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="ind.resc">+ Agregar rescate</button></div>'+
-  '<div class="card"><h3>6. Medidas generales</h3><p class="hint">Actividad física: toque una opción.</p>'+chips('ind.activ',ACTIV)+'<p class="hint" style="margin:12px 0 4px">Otras medidas</p>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div></div>'+
+  '<div class="card"><h3>6. Medidas generales</h3><p class="hint">Actividad física: toque una opción.</p>'+chips('ind.activ',ACTIV)+'<p class="hint" style="margin:12px 0 4px">Otras medidas</p>'+checks('ind.gen',GEN[d.amb])+'<div class="fields" style="margin-top:6px">'+fA('ind.genO','Otras medidas generales',{op:'opcional',rows:2})+'</div>'+(dom?'':'<p class="hint" style="margin:14px 0 4px"><b>Cuidados geriátricos y prevención de complicaciones</b> (geriatría y medicina interna)</p><button type="button" class="btn ghost sm" data-act="todasGer" style="margin-bottom:6px">Marcar todas</button>'+checks('ind.ger',GER))+'</div>'+
   '<div class="card"><h3>7. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>8. Informar eventualidades</h3><p class="hint">'+(dom?'A quién llamar si pasa algo fuera de lo esperado.':'A quién avisar de cualquier eventualidad.')+'</p><div class="fields">'+
     fT('ind.evtA',dom?'Llamar a':'Informar a',{c:'w2'})+fT('ind.evtTel','Teléfono',{c:'w2',type:'tel',im:'tel'})+'</div>'+
@@ -406,7 +429,7 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
   '<div class="card"><h3>9. En caso de fallecimiento</h3><p class="hint">Para el paciente que no acepta maniobras de reanimación y tiene riesgo de fallecer. Marque las recomendaciones que apliquen.</p>'+
     '<button type="button" class="btn ghost sm" data-act="todas" data-k="ind.fallece" style="margin-bottom:6px">Marcar todas</button>'+checks('ind.fallece',FALLECE[d.amb])+
     '<div class="fields" style="margin-top:6px">'+fA('ind.falleceO','Otras recomendaciones',{op:'opcional',rows:2})+'</div></div>'+
-  (dom?'':'<div class="card"><h3>10. Estudios e interconsultas</h3><div class="fields">'+fA('ind.estudios','Laboratorio, gabinete o interconsultas',{op:'opcional',rows:2})+'</div></div>')+
+  (dom?'':'<div class="card"><h3>10. Estudios e interconsultas</h3><p class="hint">Toque los que pida.</p>'+checks('ind.lab',LAB)+'<div class="fields" style="margin-top:6px">'+fA('ind.estudios','Otros estudios o interconsultas',{op:'opcional, uno por renglón',rows:2})+'</div></div>')+
   '<div class="card"><h3>'+(dom?'10':'11')+'. Otras indicaciones</h3><div class="fields">'+fA('ind.otras','Otras indicaciones',{op:'opcional',rows:2})+'</div></div>';
   return h;
 };
@@ -535,6 +558,7 @@ function prev(){ var el=$('prev'); if(!el) return; var t=cur==='cons'?textoCons(
 var cur=null;
 function renderHome(){
   $('ptHome').innerHTML=ptCard(false);
+  renderGuardados();
   $('tiles').innerHTML=MODS.map(function(m){
     return '<button type="button" class="tile" data-act="go" data-v="'+m.id+'" style="--c:var(--c-'+m.id+');--t:var(--t-'+m.id+')"><span class="ic">'+ICON[m.id]+'</span><span class="tx"><span class="tt">'+m.t+'</span><span class="ds">'+m.d+'</span></span>'+
       '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
@@ -581,6 +605,10 @@ document.addEventListener('click',function(e){
   if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:/neb$/.test(k)?{med:'',dosis:'',dil:'',frec:'',con:''}:nuevoMed()); guardar(); renderMod(true);
     var items=$('modBody').querySelectorAll('[data-k^="'+k+'.'+(arr.length-1)+'."]'); if(items[0]){ items[0].scrollIntoView({block:'center'}); try{ items[0].focus({preventScroll:true}); }catch(x){} } return; }
   if(a==='del'){ getP(k).splice(+b.getAttribute('data-i'),1); guardar(); renderMod(true); return; }
+  if(a==='abrirPac'){ abrirPac(v); renderHome(); var t=$('ptHome'); if(t) t.scrollIntoView({block:'start'}); return; }
+  if(a==='borrarPac'){ if(!b.classList.contains('arm')){ b.classList.add('arm'); b.textContent='Toque otra vez'; b.style.color='var(--danger)'; setTimeout(function(){ if(b.isConnected){ b.classList.remove('arm'); b.textContent='Borrar'; b.style.color=''; } },3500); return; }
+    var G=lsG(); delete G[v]; lsG(G); renderGuardados(); return; }
+  if(a==='todasGer'){ setP('ind.ger',GER.slice()); renderMod(true); return; }
   if(a==='todas'){ setP(k,FALLECE[S.ind.amb].slice()); renderMod(true); return; }
   if(a==='editar'){ var o=S[k]; o.texto=k==='cons'?textoCons():textoDef(); if(k==='cons') o.textoEn=textoConsEn(); o.edit=true; guardar(); renderMod(true); return; }
   if(a==='regen'){ S[k].edit=false; guardar(); renderMod(true); return; }
@@ -608,7 +636,9 @@ function generar(){
   precargar().then(function(){
     var d=null; try{ d=PDF[cur](); }catch(e){ if(window.console) console.error(e); }
     if(!d){ msg('No se pudo crear el PDF en este navegador.',true); return; }
+    guardarPac(cur);
     guardarPDF(d);
+    if(cur==='receta'||cur==='ind') $('pdfMsg').textContent+=' Quedó guardada con el nombre del paciente para la siguiente consulta.';
   },function(){ msg('No se pudo descargar el formato. Revise su conexión e intente de nuevo.',true); });
 }
 function validar(){
@@ -805,6 +835,8 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
   if(o.activ) gen.unshift([{t:'Actividad: ',b:1,c:G.C.PLUM},{t:low1(o.activ)+'.',b:1}]);
   if(gen.length){ sec('Medidas generales'); gen.forEach(function(x){ G.li(x); }); G.y+=4; }
   var conf=CONF.filter(function(x){ return o.conf.indexOf(x)>=0; }).concat(lineas(o.confO));
+  var ger=dom?[]:GER.filter(function(x){ return (o.ger||[]).indexOf(x)>=0; });
+  if(ger.length){ sec('Cuidados geriátricos y prevención de complicaciones'); ger.forEach(function(x){ G.li(x); }); G.y+=4; }
   if(conf.length){ sec('Medidas de confort'); conf.forEach(function(x){ G.li(x); }); G.y+=4; }
   var al=(dom?ALARMA.dom.filter(function(x){ return o.alarma.indexOf(x)>=0; }):ALARMA.hosp.slice()).concat(lineas(o.alarmaO));
   if(al.length||trim(o.evtA)||trim(o.evtTel)){ sec('Informar eventualidades');
@@ -813,7 +845,8 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
     G.y+=4; }
   var fa=FALLECE[o.amb].filter(function(x){ return o.fallece.indexOf(x)>=0; }).concat(lineas(o.falleceO));
   if(fa.length){ sec('En caso de fallecimiento'); fa.forEach(function(x){ G.li(x); }); G.y+=4; }
-  if(!dom&&trim(o.estudios)){ sec('Estudios e interconsultas'); lineas(o.estudios).forEach(function(x){ G.li(x); }); G.y+=4; }
+  var est=dom?[]:LAB.filter(function(x){ return (o.lab||[]).indexOf(x)>=0; }).concat(lineas(o.estudios));
+  if(est.length){ sec('Estudios e interconsultas'); est.forEach(function(x){ G.li(x); }); G.y+=4; }
   if(trim(o.otras)){ sec('Otras indicaciones'); lineas(o.otras).forEach(function(x){ G.li(x); }); }
   G.firma(); return G.fin();
 };
