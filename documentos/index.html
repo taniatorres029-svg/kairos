@@ -181,6 +181,7 @@ footer.own b{color:var(--ink)}
   </div></div>
   <main class="wrap" id="modBody"></main>
   <div class="dock"><div class="dock-r">
+    <div id="firmaBox"></div>
     <button type="button" class="btn" id="pdfBtn" data-act="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6M9 15l3 3 3-3"/></svg><span id="pdfTxt">Generar PDF</span></button>
     <div class="msg" id="pdfMsg" aria-live="polite"></div>
   </div></div>
@@ -264,6 +265,44 @@ var MODS=[
  {id:'def',t:'Parte médico de defunción',d:'Fallecimiento en domicilio: causa y constatación, para mostrar a autoridades o funeraria.',hdr:'PARTE MÉDICO',arch:'Parte_medico'}
 ];
 function mod(id){ for(var i=0;i<MODS.length;i++) if(MODS[i].id===id) return MODS[i]; }
+
+/* Firma: la imagen se guarda sólo en este dispositivo (nunca va en la página publicada). */
+var FIRMA_K='kairos_firma_img', FIRMAR_K='kairos_firmar';
+function firmaImg(){ try{ return localStorage.getItem(FIRMA_K)||''; }catch(e){ return ''; } }
+function firmarOn(){ try{ return localStorage.getItem(FIRMAR_K)!=='0'; }catch(e){ return true; } }
+function setFirmar(v){ try{ localStorage.setItem(FIRMAR_K,v?'1':'0'); }catch(e){} }
+function firmaActiva(){ return !!firmaImg()&&firmarOn(); }
+function quitarFirma(){ try{ localStorage.removeItem(FIRMA_K); }catch(e){} }
+function procesarFirma(file,cb){
+  var fr=new FileReader();
+  fr.onload=function(){ var im=new Image(); im.onload=function(){
+    var k=Math.min(1,900/im.width), W=Math.max(1,Math.round(im.width*k)), H=Math.max(1,Math.round(im.height*k));
+    var c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,W,H); x.drawImage(im,0,0,W,H);
+    var D=x.getImageData(0,0,W,H), p=D.data, x0=W, x1=-1, y0=H, y1=-1, i, a;
+    for(i=0;i<p.length;i+=4){ var l=(0.299*p[i]+0.587*p[i+1]+0.114*p[i+2])/255; a=1-l; a=a<0.18?0:Math.min(1,(a-0.18)/0.5);
+      p[i]=24; p[i+1]=30; p[i+2]=64; p[i+3]=Math.round(a*255);
+      if(a>0.3){ var px=(i/4)%W, py=Math.floor(i/4/W); if(px<x0)x0=px; if(px>x1)x1=px; if(py<y0)y0=py; if(py>y1)y1=py; } }
+    if(x1<0){ cb(false); return; }
+    x.putImageData(D,0,0); x0=Math.max(0,x0-6); y0=Math.max(0,y0-6); x1=Math.min(W-1,x1+6); y1=Math.min(H-1,y1+6);
+    var o=document.createElement('canvas'); o.width=x1-x0+1; o.height=y1-y0+1; o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);
+    try{ localStorage.setItem(FIRMA_K,o.toDataURL('image/png')); setFirmar(true); cb(true); }catch(e){ cb(false); }
+  }; im.onerror=function(){ cb(false); }; im.src=fr.result; };
+  fr.onerror=function(){ cb(false); }; fr.readAsDataURL(file);
+}
+function dibujarFirma(d,cx,yLinea){ var u=firmaImg(); if(!u||!firmarOn()) return;
+  try{ var pr=d.getImageProperties(u), w=130, h=w*pr.height/pr.width; if(h>64){ h=64; w=h*pr.width/pr.height; } d.addImage(u,'PNG',cx-w/2,yLinea-h+8,w,h,'firma'); }catch(e){} }
+function htmlFirma(){ var u=firmaImg();
+  if(!u) return '<div class="firmabox"><label class="btn ghost sm firmaadd">Agregar mi firma al PDF<input type="file" accept="image/*" data-firma="subir" hidden></label><span class="firmahint">Foto de la firma en hoja blanca. Se guarda sólo en este dispositivo.</span></div>';
+  return '<div class="firmabox"><label class="firmachk"><input type="checkbox" data-firma="on"'+(firmarOn()?' checked':'')+'> Firmar el PDF</label><img src="'+u+'" alt="Firma" class="firmaimg"><label class="btn ghost sm">Cambiar<input type="file" accept="image/*" data-firma="subir" hidden></label><button type="button" class="btn ghost sm" data-firma="quitar">Quitar</button></div>'; }
+var FIRMA_CSS='.firmabox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px}.firmabox .firmaimg{height:40px;max-width:120px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}.firmachk{display:flex;gap:8px;align-items:center;font-weight:700;min-height:44px}.firmachk input{width:22px;height:22px}.firmahint{font-size:.82rem;color:var(--muted);flex:1 1 180px}.firmaadd{cursor:pointer}';
+function enlazarFirma(raiz,alCambiar){
+  raiz.addEventListener('change',function(e){ var t=e.target, f=t.getAttribute&&t.getAttribute('data-firma'); if(!f) return;
+    if(f==='on'){ setFirmar(t.checked); alCambiar(); }
+    if(f==='subir'&&t.files&&t.files[0]) procesarFirma(t.files[0],function(ok){ alCambiar(ok?'':'No se pudo leer la imagen de la firma.'); }); });
+  raiz.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-firma="quitar"]'); if(!t) return;
+    if(!t.classList.contains('arm')){ t.classList.add('arm'); t.textContent='Toque otra vez'; setTimeout(function(){ if(t.isConnected){ t.classList.remove('arm'); t.textContent='Quitar'; } },3500); return; }
+    quitarFirma(); alCambiar(); });
+}
 
 /* ---------- estado ---------- */
 function hoyISO(){ var d=new Date(), p=function(n){ return (n<10?'0':'')+n; }; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
@@ -575,9 +614,12 @@ function route(){
   var m=/^#\/(\w+)/.exec(location.hash), id=m&&mod(m[1])?m[1]:null;
   cur=id; $('pdfMsg').textContent=''; $('pdfMsg').className='msg';
   $('homeView').hidden=!!id; $('modView').hidden=!id;
-  if(id){ renderMod(false); window.scrollTo(0,0); precargar(); } else renderHome();
+  if(id){ renderMod(false); pintarFirma(); window.scrollTo(0,0); precargar(); } else renderHome();
 }
 window.addEventListener('hashchange',route);
+function pintarFirma(err){ var b=$('firmaBox'); if(b) b.innerHTML=htmlFirma(); if(err) msg(err,true); }
+document.head.insertAdjacentHTML('beforeend','<style>'+FIRMA_CSS+'</style>');
+enlazarFirma($('firmaBox'),pintarFirma);
 
 /* ---------- eventos ---------- */
 function onField(e){
@@ -725,8 +767,9 @@ function hoja(hdr,fechaTxt){
   G.banda=function(t,c){ G.hay(60); col(c||C.PLUM,'setFillColor'); d.roundedRect(X0,G.y,X1-X0,18,3,3,'F'); fnt('bold',9.6,C.WHITE); txt(t.toUpperCase(),X0+9,G.y+12.4); G.y+=25; };
   G.li=function(t,o){ o=o||{}; var size=o.size||10, lead=o.lead||13.4, lines=G.env(typeof t==='string'?[{t:t}]:t,size,X1-X0-16);
     lines.forEach(function(ln,i){ G.hay(lead); if(!i){ col(C.ORCH,'setFillColor'); d.circle(X0+5,G.y+5,1.8,'F'); } G.pintar(ln,X0+14,G.y+size*0.8,size); G.y+=lead; }); G.y+=2.5; };
-  G.firma=function(){
-    G.hay(72); G.y+=34;
+  G.firma=function(){ var fi=firmaActiva();
+    G.hay(fi?104:72); G.y+=fi?64:34;
+    dibujarFirma(d,X1-105,G.y);
     col(C.INK,'setDrawColor'); d.setLineWidth(0.7); d.line(X1-210,G.y,X1,G.y);
     fnt('bold',9,C.INK); txt('Dra. Gabriela Alejandra López Ortiz',X1-105,G.y+12,{align:'center'});
     fnt('normal',7.8,C.GRAY); txt('Anestesiología · Medicina Paliativa y del Dolor',X1-105,G.y+22,{align:'center'}); txt('Céd. Prof. 6383462 · Céd. Esp. 12184347',X1-105,G.y+31,{align:'center'});
