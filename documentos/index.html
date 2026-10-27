@@ -272,7 +272,7 @@ function base(){
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
     receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
-    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],activ:'',estudios:'',otras:''},
+    ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],alarmaO:'',activ:'',estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
     def:{fecha:f,lugar:'Guadalajara, Jalisco',dom:'',ffall:f,hfall:'',fconst:f,hconst:'',desde:'',ca:'',ta:'',cb:'',tb:'',cc:'',tc:'',cbas:'',tbas:'',otros:'',signos:SIGNOS.slice(),viol:true,inf:'',infpar:'',folio:'',edit:false,texto:''}
@@ -401,7 +401,8 @@ VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
   '<div class="card"><h3>7. Medidas de confort</h3>'+checks('ind.conf',CONF)+'<div class="fields" style="margin-top:6px">'+fA('ind.confO','Otras medidas de confort',{op:'opcional',rows:2})+'</div></div>'+
   '<div class="card"><h3>8. Informar eventualidades</h3><p class="hint">'+(dom?'A quién llamar si pasa algo fuera de lo esperado.':'A quién avisar de cualquier eventualidad.')+'</p><div class="fields">'+
     fT('ind.evtA',dom?'Llamar a':'Informar a',{c:'w2'})+fT('ind.evtTel','Teléfono',{c:'w2',type:'tel',im:'tel'})+'</div>'+
-    '<p class="hint" style="margin:12px 0 4px">'+(dom?'Llamar sobre todo si…':'Avisar sobre todo si…')+'</p>'+checks('ind.alarma',ALARMA[d.amb])+'</div>'+
+    '<p class="hint" style="margin:12px 0 4px">'+(dom?'Llamar sobre todo si…':'Avisar sobre todo si… (siempre salen en la hoja)')+'</p>'+(dom?checks('ind.alarma',ALARMA.dom):'<ul style="margin:4px 0 0;padding-left:20px;font-size:.95rem;line-height:1.6">'+ALARMA.hosp.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>')+
+    '<div class="fields" style="margin-top:8px">'+fA('ind.alarmaO','Otros datos de alarma',{op:'opcional, uno por renglón',rows:2})+'</div></div>'+
   '<div class="card"><h3>9. En caso de fallecimiento</h3><p class="hint">Para el paciente que no acepta maniobras de reanimación y tiene riesgo de fallecer. Marque las recomendaciones que apliquen.</p>'+
     '<button type="button" class="btn ghost sm" data-act="todas" data-k="ind.fallece" style="margin-bottom:6px">Marcar todas</button>'+checks('ind.fallece',FALLECE[d.amb])+
     '<div class="fields" style="margin-top:6px">'+fA('ind.falleceO','Otras recomendaciones',{op:'opcional',rows:2})+'</div></div>'+
@@ -805,7 +806,7 @@ PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICA
   if(gen.length){ sec('Medidas generales'); gen.forEach(function(x){ G.li(x); }); G.y+=4; }
   var conf=CONF.filter(function(x){ return o.conf.indexOf(x)>=0; }).concat(lineas(o.confO));
   if(conf.length){ sec('Medidas de confort'); conf.forEach(function(x){ G.li(x); }); G.y+=4; }
-  var al=ALARMA[o.amb].filter(function(x){ return o.alarma.indexOf(x)>=0; });
+  var al=(dom?ALARMA.dom.filter(function(x){ return o.alarma.indexOf(x)>=0; }):ALARMA.hosp.slice()).concat(lineas(o.alarmaO));
   if(al.length||trim(o.evtA)||trim(o.evtTel)){ sec('Informar eventualidades');
     G.parrafo([{t:(dom?'Ante cualquier eventualidad, llamar a ':'Informar cualquier eventualidad a ')},{t:trim(o.evtA)||'la médica tratante',b:1,c:G.C.PLUM},{t:trim(o.evtTel)?' al teléfono ':''},{t:trim(o.evtTel),b:1,c:G.C.PLUM},{t:'.'}]); G.y+=3;
     if(al.length){ G.parrafo([{t:dom?'Llamar sobre todo si:':'Avisar sobre todo si:',b:1}],{size:9.6}); G.y+=1; al.forEach(function(x){ G.li(x); }); }
