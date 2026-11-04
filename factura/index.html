@@ -137,6 +137,15 @@ footer{color:var(--muted);font-size:13px}
     <fieldset>
       <legend>Datos del pago</legend>
       <div class="field">
+        <label for="medico">¿Quién te atendió?</label>
+        <select id="medico" name="medico" required>
+          <option value="">Elige una opción</option>
+          <option value="Dra. Tania Torres">Dra. Tania Torres</option>
+          <option value="Dra. Gaby López">Dra. Gaby López</option>
+          <option value="Alleviare">Alleviare</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="paciente">Nombre del paciente</label>
         <input id="paciente" name="paciente" placeholder="Si es la misma persona, déjalo vacío">
       </div>
@@ -192,8 +201,9 @@ footer{color:var(--muted);font-size:13px}
       <div class="folio" id="folio"></div>
     </div>
     <dl id="dl"></dl>
-    <p class="hint">Después de enviar, si tienes tu Constancia de Situación Fiscal en PDF, mándala en el mismo chat. Ayuda a que no haya errores.</p>
+    <p class="hint" id="hint-wa">Después de enviar, si tienes tu Constancia de Situación Fiscal en PDF, mándala en el mismo chat. Ayuda a que no haya errores.</p>
     <div class="actions">
+      <button class="btn" type="button" id="enviar" hidden>Enviar datos</button>
       <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
       <button class="btn ghost" type="button" id="copiar">Copiar datos</button>
       <button class="btn ghost" type="button" id="editar">Corregir</button>
@@ -206,13 +216,20 @@ footer{color:var(--muted);font-size:13px}
 </div>
 
 <script>
+// Dirección de la Web App de Google Apps Script que guarda cada solicitud en la hoja de la contadora
+// (ver apps-script.gs en esta carpeta). Vacío = solo se envía por WhatsApp.
+const SHEET_URL = "";
 // Número de WhatsApp que recibe los datos (con 52 de México). Vacío = el paciente elige el contacto.
-// También se puede poner en el enlace: ...#5215512345678
+// También se puede poner en el enlace: ...#5215512345678 o ?wa=5215512345678
 const WHATSAPP = "";
+// ?para=tania | gaby | alleviare deja preseleccionado quién atendió.
+const QS = new URLSearchParams(location.search);
+const PARA = {tania:"Dra. Tania Torres", gaby:"Dra. Gaby López", alleviare:"Alleviare"};
 const $ = id => document.getElementById(id);
 const store = {get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const FISCALES = ["rfc","nombre","cp","regimen","uso","correo","tel"];
 
+if (PARA[(QS.get("para")||"").toLowerCase()]) document.getElementById("medico").value = PARA[QS.get("para").toLowerCase()];
 $("fecha").value = new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const guardado = store.get("factura-fiscales");
 if (guardado) FISCALES.forEach(k => { if (guardado[k]) $(k).value = guardado[k]; });
@@ -231,6 +248,7 @@ function validar(){
   ok = check("cp", /^\d{5}$/.test($("cp").value.trim())) && ok;
   ok = check("regimen", !!$("regimen").value) && ok;
   ok = check("correo", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("correo").value.trim())) && ok;
+  ok = check("medico", !!$("medico").value) && ok;
   ok = check("fecha", !!$("fecha").value) && ok;
   ok = check("monto", /^\d+(\.\d{1,2})?$/.test($("monto").value.replace(/[$,\s]/g,""))) && ok;
   if ($("concepto").value === "otro") ok = check("conceptoOtro", $("conceptoOtro").value.trim().length > 2) && ok;
@@ -251,6 +269,7 @@ function datos(){
     ["Correo", $("correo").value.trim()],
     ["Teléfono", $("tel").value.trim() || "—"],
     ["Pago"],
+    ["Atendido por", $("medico").value],
     ["Paciente", $("paciente").value.trim() || "El mismo titular"],
     ["Concepto", concepto],
     ["Fecha de pago", `${d}/${m}/${y}`],
@@ -271,7 +290,9 @@ $("f").addEventListener("submit", e => {
   if (!validar()) { const bad = document.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
   if ($("recordar").checked) { const g={}; FISCALES.forEach(k => g[k] = $(k).value); store.set("factura-fiscales", g); }
   else store.del("factura-fiscales");
-  const folio = "FAC-" + $("fecha").value.replace(/-/g,"").slice(2) + "-" + $("rfc").value.slice(0,4);
+  const folio = "FAC-" + $("fecha").value.replace(/-/g,"").slice(2) + "-" + $("rfc").value.slice(0,4) + "-" + Date.now().toString(36).slice(-4).toUpperCase();
+  envio = {folio, filas: Object.fromEntries(datos().filter(f => f.length === 2))};
+  envio.filas["Monto"] = Number($("monto").value.replace(/[$,\s]/g,""));
   const filas = datos();
   const dl = $("dl"); dl.textContent = "";
   filas.forEach(f => {
@@ -280,10 +301,36 @@ $("f").addEventListener("submit", e => {
   });
   $("folio").textContent = "Folio " + folio;
   const t = texto(filas, folio); $("txt").value = t;
-  const num = (/^\d{10,15}$/.test(location.hash.slice(1)) ? location.hash.slice(1) : WHATSAPP);
+  const h = location.hash.slice(1), q = QS.get("wa") || "";
+  const num = /^\d{10,15}$/.test(h) ? h : /^\d{10,15}$/.test(q) ? q : WHATSAPP;
   $("wa").href = "https://wa.me/" + num + "?text=" + encodeURIComponent(t);
   $("ok").textContent = "";
+  $("enviar").hidden = !SHEET_URL; $("enviar").disabled = false; $("enviar").textContent = "Enviar datos";
+  $("wa").hidden = !!SHEET_URL; $("hint-wa").hidden = !!SHEET_URL; $("editar").hidden = false;
   $("f").hidden = true; $("resumen").hidden = false; $("resumen").scrollIntoView({block:"start"});
+});
+
+let envio = null;
+$("enviar").addEventListener("click", async () => {
+  const b = $("enviar"); b.disabled = true; b.textContent = "Enviando…";
+  const body = JSON.stringify(envio);
+  let ok = false;
+  try {
+    const res = await fetch(SHEET_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body});
+    ok = (await res.json()).ok === true;
+  } catch (e) {
+    // Si el navegador bloquea la respuesta, se reintenta sin leerla.
+    try { await fetch(SHEET_URL, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body}); ok = true; } catch (e2) {}
+  }
+  if (ok) {
+    b.hidden = true; $("editar").hidden = true;
+    $("ok").textContent = "Listo, tus datos quedaron registrados. Recibirás tu factura en " + envio.filas["Correo"] + ".";
+    $("wa").hidden = false; $("wa").textContent = "Enviar mi constancia por WhatsApp (opcional)";
+  } else {
+    b.disabled = false; b.textContent = "Enviar datos";
+    $("ok").textContent = "No se pudieron enviar. Revisa tu conexión e inténtalo otra vez, o envíalos por WhatsApp.";
+    $("wa").hidden = false;
+  }
 });
 
 $("editar").addEventListener("click", () => { $("resumen").hidden = true; $("f").hidden = false; });
