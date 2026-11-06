@@ -17,6 +17,7 @@
   --accent:#74558C; --accent-ink:#FFFFFF; --accent-soft:#F1E8F6; --accent-line:#DAC6E6;
   --warn:#8A5200; --warn-bg:#FFF3DC; --danger:#A3243B; --danger-bg:#FCE8EC;
   --c-receta:#74558C; --t-receta:#F1E8F6;
+  --c-est:#2E7D74; --t-est:#E2F3F0;
   --c-ind:#2C6E8C; --t-ind:#E4F1F6;
   --c-cons:#3A7A4C; --t-cons:#E6F3E9;
   --c-res:#B0502A; --t-res:#FBEBE3;
@@ -29,13 +30,13 @@
   --bg:#17121A; --surface:#211A25; --ink:#EEE7F1; --muted:#B3A6BA; --line:#382E3E;
   --accent:#C7A6DE; --accent-ink:#1E1622; --accent-soft:#2E2338; --accent-line:#4E3B5C;
   --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
-  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
+  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-est:#86D3C8; --t-est:#15302C; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
   --c-res:#F0A07C; --t-res:#3A2219; --c-def:#B9BDD3; --t-def:#26283A; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17121A; --surface:#211A25; --ink:#EEE7F1; --muted:#B3A6BA; --line:#382E3E;
   --accent:#C7A6DE; --accent-ink:#1E1622; --accent-soft:#2E2338; --accent-line:#4E3B5C;
   --warn:#F2B45A; --warn-bg:#382812; --danger:#FF8FA3; --danger-bg:#3B1620;
-  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
+  --c-receta:#C7A6DE; --t-receta:#2E2338; --c-est:#86D3C8; --t-est:#15302C; --c-ind:#7EC3E0; --t-ind:#16303B; --c-cons:#8FD1A0; --t-cons:#183022;
   --c-res:#F0A07C; --t-res:#3A2219; --c-def:#B9BDD3; --t-def:#26283A; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -181,7 +182,6 @@ footer.own b{color:var(--ink)}
   </div></div>
   <main class="wrap" id="modBody"></main>
   <div class="dock"><div class="dock-r">
-    <div id="firmaBox"></div>
     <button type="button" class="btn" id="pdfBtn" data-act="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6M9 15l3 3 3-3"/></svg><span id="pdfTxt">Generar PDF</span></button>
     <div class="msg" id="pdfMsg" aria-live="polite"></div>
   </div></div>
@@ -227,7 +227,15 @@ var GEN={
 };
 var GER=['Prevención de delirium: orientarlo en tiempo y lugar cada turno, con reloj y calendario a la vista','Respetar el sueño: luz apagada y sin tomas de signos ni medicamentos innecesarios de 23 a 6 h','Lentes, aparatos auditivos y prótesis dental a su alcance','Vigilar delirium por turno (CAM); avisar si hay un cambio brusco en la atención o el estado de alerta','Evitar la sujeción física; si es indispensable, con indicación médica y revaloración cada 2 horas','Prevención de caídas: barandales arriba, cama baja, timbre a la mano y calzado antiderrapante; levantarlo siempre acompañado','Movilización temprana: sentarlo en el sillón y caminar acompañado 3 veces al día, si su estado lo permite','Cambios de posición cada 2 horas y escala de Braden por turno','Precauciones de aspiración: sentado a 90 grados para comer; valorar la deglución antes de iniciar la vía oral','Higiene bucal 3 veces al día','Profilaxis de trombosis según riesgo (Padua) y riesgo de sangrado','Conciliación de medicamentos: revisar polifarmacia y suspender los potencialmente inapropiados (criterios STOPP / Beers)','Evitar benzodiacepinas, anticolinérgicos y antihistamínicos de primera generación','Acompañamiento de un familiar las 24 horas para orientación y apoyo','Planear el egreso desde el ingreso: cuidador, equipo en casa (cama, oxígeno, silla) y seguimiento'];
 var LAB=['Biometría hemática','Química sanguínea (glucosa, urea, creatinina)','Electrolitos séricos (Na, K, Cl, Ca, Mg, P)','Pruebas de función hepática','Albúmina','Tiempos de coagulación','Examen general de orina','Gasometría','Radiografía de tórax','Electrocardiograma'];
-var EST=['Biometría hemática','Química sanguínea (glucosa, urea, creatinina)','Electrolitos séricos (Na, K, Cl, Ca, Mg, P)','Pruebas de función hepática','Albúmina','Tiempos de coagulación','Examen general de orina','Hemoglobina glucosilada (HbA1c)','Perfil tiroideo (TSH, T4 libre)','Vitamina B12 y ácido fólico','Vitamina D','Ferritina y perfil de hierro','Radiografía de tórax','Ultrasonido abdominal','Tomografía','Resonancia magnética','Electrocardiograma'];
+var EST_LAB=[
+ ['Hematología',['Biometría hemática completa','Tiempos de coagulación (TP, TTPa, INR)','Velocidad de sedimentación globular','Grupo sanguíneo y Rh']],
+ ['Química',['Química sanguínea (glucosa, urea, creatinina, BUN)','Electrolitos séricos (Na, K, Cl)','Calcio, fósforo y magnesio','Pruebas de función hepática','Perfil de lípidos','Ácido úrico','Albúmina y proteínas totales','Hemoglobina glucosilada (HbA1c)','Proteína C reactiva','Deshidrogenasa láctica (DHL)','Amonio']],
+ ['Endocrino y nutrición',['Perfil tiroideo (TSH, T4 libre)','Vitamina B12 y ácido fólico','Vitamina D (25-OH)','Ferritina y perfil de hierro','Cortisol matutino','Testosterona']],
+ ['Orina y heces',['Examen general de orina','Urocultivo','Depuración de creatinina en orina de 24 h','Coprológico','Sangre oculta en heces']],
+ ['Otros',['Gasometría arterial','Procalcitonina','Hemocultivos','Marcadores tumorales (especificar abajo)','Niveles séricos de fármaco (especificar abajo)']]
+];
+var EST_IMG=['Radiografía','Ultrasonido','Tomografía','Resonancia magnética','Gammagrama óseo','PET-CT','Densitometría ósea','Mastografía','Electrocardiograma','Ecocardiograma','Holter','Endoscopia','Colonoscopia','Espirometría','Otro'];
+var EST_CONTR=['Simple (sin contraste)','Con contraste','Simple y contrastada'];
 var VOLTIPO=['Expresadas verbalmente','Firmadas en documento de voluntad anticipada','Firmadas ante notario'];
 var VOL=['No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
 var O2DEV=['Puntas nasales','Mascarilla simple','Mascarilla con reservorio','Mascarilla Venturi','Cánula nasal de alto flujo','Ventilación no invasiva (CPAP / BiPAP)','Otro'];
@@ -253,13 +261,15 @@ var MOTIVO_RES=['Envío a su médico tratante','Interconsulta / segunda opinión
 
 var ICON={
  receta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7a4 4 0 0 1 0 8H6zM6 11v10M10 11l8 10M18 13l-6 8"/></svg>',
+ est:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/></svg>',
  ind:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>',
  cons:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><circle cx="12" cy="14" r="2.5"/><path d="M10.5 16.2 10 20l2-1 2 1-.5-3.8"/></svg>',
  res:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
  def:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-3-7-6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 10z"/><path d="M12 8v8"/></svg>'
 };
 var MODS=[
- {id:'receta',t:'Receta médica',d:'Medicamentos en formato fácil (dosis, para qué es, cómo y cuánto tiempo), rescates y solicitud de estudios.',hdr:'RECETA MÉDICA',arch:'Receta'},
+ {id:'receta',t:'Receta médica',d:'Medicamentos en formato fácil: dosis, para qué es, cómo y cuánto tiempo. Con rescates.',hdr:'RECETA MÉDICA',arch:'Receta'},
+ {id:'est',t:'Solicitud de estudios',d:'Laboratorio, imagen y gabinete, con datos clínicos, preparación y urgencia.',hdr:'SOLICITUD DE ESTUDIOS',arch:'Estudios'},
  {id:'ind',t:'Indicaciones médicas',d:'Domicilio u hospital: dieta, soluciones, medicamentos, rescates, medidas generales y de confort.',hdr:'INDICACIONES MÉDICAS',arch:'Indicaciones'},
  {id:'cons',t:'Constancia médica',d:'Para el familiar que trabaja o viene de otro país, o para el paciente.',hdr:'CONSTANCIA MÉDICA',arch:'Constancia'},
  {id:'res',t:'Resumen médico',d:'Resumen breve para su médico tratante o para lo que el paciente necesite.',hdr:'RESUMEN MÉDICO',arch:'Resumen'},
@@ -290,17 +300,42 @@ function procesarFirma(file,cb){
   }; im.onerror=function(){ cb(false); }; im.src=fr.result; };
   fr.onerror=function(){ cb(false); }; fr.readAsDataURL(file);
 }
+function padFirma(cb){
+  var ov=document.createElement('div'); ov.className='firmapad';
+  ov.innerHTML='<div class="fpbox"><b>Firme con el dedo dentro del recuadro</b><canvas></canvas><div class="fpbtns"><button type="button" class="btn ghost sm" data-fp="borrar">Borrar</button><button type="button" class="btn ghost sm" data-fp="cancelar">Cancelar</button><button type="button" class="btn sm" data-fp="ok">Guardar firma</button></div></div>';
+  document.body.appendChild(ov);
+  var cv=ov.querySelector('canvas'), r=window.devicePixelRatio||1, W=Math.min(560,window.innerWidth-72), H=Math.round(W*0.45);
+  cv.style.width=W+'px'; cv.style.height=H+'px'; cv.width=W*r; cv.height=H*r;
+  var x=cv.getContext('2d'); x.scale(r,r); x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='rgb(24,30,64)'; x.lineWidth=2.6;
+  var dib=false, hay=false, lx=0, ly=0;
+  var pos=function(e){ var b=cv.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; };
+  cv.addEventListener('pointerdown',function(e){ e.preventDefault(); dib=true; try{ cv.setPointerCapture(e.pointerId); }catch(z){} var q=pos(e); lx=q[0]; ly=q[1]; x.beginPath(); x.arc(lx,ly,1.2,0,7); x.fillStyle=x.strokeStyle; x.fill(); hay=true; });
+  cv.addEventListener('pointermove',function(e){ if(!dib) return; e.preventDefault(); var q=pos(e); x.beginPath(); x.moveTo(lx,ly); x.lineTo(q[0],q[1]); x.stroke(); lx=q[0]; ly=q[1]; });
+  var fin=function(){ dib=false; }; cv.addEventListener('pointerup',fin); cv.addEventListener('pointercancel',fin);
+  cv.style.touchAction='none';
+  ov.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-fp]'); if(!t) return; var a=t.getAttribute('data-fp');
+    if(a==='borrar'){ x.clearRect(0,0,W,H); hay=false; return; }
+    if(a==='cancelar'){ ov.remove(); cb(); return; }
+    if(a==='ok'){ if(!hay){ ov.remove(); cb(); return; }
+      var D=x.getImageData(0,0,cv.width,cv.height), p=D.data, x0=cv.width, x1=-1, y0=cv.height, y1=-1;
+      for(var i=3;i<p.length;i+=4){ if(p[i]>40){ var px=((i-3)/4)%cv.width, py=Math.floor((i-3)/4/cv.width); if(px<x0)x0=px; if(px>x1)x1=px; if(py<y0)y0=py; if(py>y1)y1=py; } }
+      if(x1<0){ ov.remove(); cb(); return; }
+      x0=Math.max(0,x0-8); y0=Math.max(0,y0-8); x1=Math.min(cv.width-1,x1+8); y1=Math.min(cv.height-1,y1+8);
+      var o=document.createElement('canvas'); o.width=x1-x0+1; o.height=y1-y0+1; o.getContext('2d').drawImage(cv,x0,y0,o.width,o.height,0,0,o.width,o.height);
+      try{ localStorage.setItem(FIRMA_K,o.toDataURL('image/png')); setFirmar(true); ov.remove(); cb(); }catch(z){ ov.remove(); cb('No se pudo guardar la firma.'); } } });
+}
 function dibujarFirma(d,cx,yLinea){ var u=firmaImg(); if(!u||!firmarOn()) return;
   try{ var pr=d.getImageProperties(u), w=130, h=w*pr.height/pr.width; if(h>64){ h=64; w=h*pr.width/pr.height; } d.addImage(u,'PNG',cx-w/2,yLinea-h+8,w,h,'firma'); }catch(e){} }
 function htmlFirma(){ var u=firmaImg();
-  if(!u) return '<div class="firmabox"><label class="btn ghost sm firmaadd">Agregar mi firma al PDF<input type="file" accept="image/*" data-firma="subir" hidden></label><span class="firmahint">Foto de la firma en hoja blanca. Se guarda sólo en este dispositivo.</span></div>';
-  return '<div class="firmabox"><label class="firmachk"><input type="checkbox" data-firma="on"'+(firmarOn()?' checked':'')+'> Firmar el PDF</label><img src="'+u+'" alt="Firma" class="firmaimg"><label class="btn ghost sm">Cambiar<input type="file" accept="image/*" data-firma="subir" hidden></label><button type="button" class="btn ghost sm" data-firma="quitar">Quitar</button></div>'; }
-var FIRMA_CSS='.firmabox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px}.firmabox .firmaimg{height:40px;max-width:120px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}.firmachk{display:flex;gap:8px;align-items:center;font-weight:700;min-height:44px}.firmachk input{width:22px;height:22px}.firmahint{font-size:.82rem;color:var(--muted);flex:1 1 180px}.firmaadd{cursor:pointer}';
+  if(!u) return '<div class="firmabox"><b style="flex:1 1 100%">Firma en el PDF</b><button type="button" class="btn ghost sm" data-firma="dibujar">Dibujar mi firma</button><label class="btn ghost sm firmaadd">Subir foto de la firma<input type="file" accept="image/*" data-firma="subir" hidden></label><span class="firmahint">Se hace una sola vez y se guarda sólo en este dispositivo.</span></div>';
+  return '<div class="firmabox"><label class="firmachk"><input type="checkbox" data-firma="on"'+(firmarOn()?' checked':'')+'> Firmar el PDF</label><img src="'+u+'" alt="Firma" class="firmaimg"><button type="button" class="btn ghost sm" data-firma="dibujar">Volver a dibujar</button><label class="btn ghost sm">Subir foto<input type="file" accept="image/*" data-firma="subir" hidden></label><button type="button" class="btn ghost sm" data-firma="quitar">Quitar</button></div>'; }
+var FIRMA_CSS='.firmabox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px}.firmabox .firmaimg{height:40px;max-width:120px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}.firmachk{display:flex;gap:8px;align-items:center;font-weight:700;min-height:44px}.firmachk input{width:22px;height:22px}.firmahint{font-size:.82rem;color:var(--muted);flex:1 1 180px}.firmaadd{cursor:pointer}.firmapad{position:fixed;inset:0;z-index:999;background:rgba(20,14,30,.55);display:grid;place-items:center;padding:16px}.firmapad .fpbox{background:var(--surface,#fff);border-radius:16px;padding:16px;display:grid;gap:10px;max-width:100%}.firmapad canvas{background:#fff;border:2px dashed #b9a6cc;border-radius:12px;display:block}.firmapad .fpbtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}';
 function enlazarFirma(raiz,alCambiar){
   raiz.addEventListener('change',function(e){ var t=e.target, f=t.getAttribute&&t.getAttribute('data-firma'); if(!f) return;
     if(f==='on'){ setFirmar(t.checked); alCambiar(); }
     if(f==='subir'&&t.files&&t.files[0]) procesarFirma(t.files[0],function(ok){ alCambiar(ok?'':'No se pudo leer la imagen de la firma.'); }); });
-  raiz.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-firma="quitar"]'); if(!t) return;
+  raiz.addEventListener('click',function(e){ var dz=e.target.closest&&e.target.closest('[data-firma="dibujar"]'); if(dz){ padFirma(function(err){ alCambiar(err||''); }); return; }
+    var t=e.target.closest&&e.target.closest('[data-firma="quitar"]'); if(!t) return;
     if(!t.classList.contains('arm')){ t.classList.add('arm'); t.textContent='Toque otra vez'; setTimeout(function(){ if(t.isConnected){ t.classList.remove('arm'); t.textContent='Quitar'; } },3500); return; }
     quitarFirma(); alCambiar(); });
 }
@@ -314,7 +349,8 @@ function base(){
   var f=hoyISO();
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
-    receta:{fecha:f,est:[],estO:'',estDx:'',estAy:false,meds:[nuevoMed()],resc:[],recom:'',cita:''},
+    est:{fecha:f,lab:[],labO:'',img:[],dx:'',motivo:'',urg:'Ordinario',ayuno:false,obs:''},
+    receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
     ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',ger:[],lab:[],dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],alarmaO:'',activ:'',estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
@@ -339,18 +375,18 @@ var GK='kairos_docs_pacientes_v1', DIAS_GUARDA=60;
 function lsG(v){ try{ if(v===undefined) return JSON.parse(localStorage.getItem(GK)||'{}')||{}; localStorage.setItem(GK,JSON.stringify(v)); }catch(e){ return {}; } }
 function claveP(n){ return String(n||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' '); }
 function purgar(){ var G=lsG(), lim=Date.now()-DIAS_GUARDA*864e5, cam=false; Object.keys(G).forEach(function(k){ if(!G[k]||!(G[k].t>lim)){ delete G[k]; cam=true; } }); if(cam) lsG(G); return G; }
-function guardarPac(doc){ var k=claveP(S.pt.nombre); if(!k||(doc!=='receta'&&doc!=='ind')) return; var G=purgar(), e=G[k]||{docs:{}};
+function guardarPac(doc){ var k=claveP(S.pt.nombre); if(!k||(doc!=='receta'&&doc!=='ind'&&doc!=='est')) return; var G=purgar(), e=G[k]||{docs:{}};
   e.nombre=trim(S.pt.nombre); e.pt=JSON.parse(JSON.stringify(S.pt)); e.docs=e.docs||{}; e.docs[doc]={v:JSON.parse(JSON.stringify(S[doc])),t:Date.now()}; e.t=Date.now(); G[k]=e; lsG(G); }
 function abrirPac(k){ var G=purgar(), e=G[k]; if(!e) return; var b=base();
   Object.keys(b.pt).forEach(function(j){ if(e.pt&&e.pt[j]!==undefined) b.pt[j]=e.pt[j]; }); S.pt=b.pt;
-  ['receta','ind'].forEach(function(d){ var o=b[d]; if(e.docs&&e.docs[d]){ var v=e.docs[d].v||{}; Object.keys(o).forEach(function(j){ if(v[j]!==undefined) o[j]=v[j]; }); o.fecha=hoyISO(); if(d==='ind') o.hora=ahora(); } S[d]=o; });
+  ['receta','ind','est'].forEach(function(d){ var o=b[d]; if(e.docs&&e.docs[d]){ var v=e.docs[d].v||{}; Object.keys(o).forEach(function(j){ if(v[j]!==undefined) o[j]=v[j]; }); o.fecha=hoyISO(); if(d==='ind') o.hora=ahora(); } S[d]=o; });
   e.t=Date.now(); G[k]=e; lsG(G); guardar(); }
 function fCh(t){ var d=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear(); }
 function renderGuardados(){ var el=$('guardados'); if(!el) return; var G=purgar(), ks=Object.keys(G).sort(function(a,b){ return G[b].t-G[a].t; });
   if(!ks.length){ el.innerHTML=''; return; }
-  el.innerHTML='<div class="card"><h3>Pacientes con recetas o indicaciones guardadas</h3><p class="hint">Toque un nombre para cargar su última receta e indicaciones y modificarlas. Se guardan sólo en este dispositivo y se borran solas si pasan '+DIAS_GUARDA+' días sin usarse.</p>'+
+  el.innerHTML='<div class="card"><h3>Pacientes con documentos guardados</h3><p class="hint">Toque un nombre para cargar su última receta, indicaciones y solicitud de estudios y modificarlas. Se guardan sólo en este dispositivo y se borran solas si pasan '+DIAS_GUARDA+' días sin usarse.</p>'+
     (ks.length>6?'<div class="fields"><label class="f w4">Buscar paciente<input type="search" id="gBus" autocomplete="off" placeholder="Escriba parte del nombre"></label></div>':'')+
-    '<div id="gLista">'+ks.map(function(k){ var e=G[k], dd=[]; if(e.docs.receta) dd.push('receta '+fCh(e.docs.receta.t)); if(e.docs.ind) dd.push('indicaciones '+fCh(e.docs.ind.t));
+    '<div id="gLista">'+ks.map(function(k){ var e=G[k], dd=[]; if(e.docs.receta) dd.push('receta '+fCh(e.docs.receta.t)); if(e.docs.ind) dd.push('indicaciones '+fCh(e.docs.ind.t)); if(e.docs.est) dd.push('estudios '+fCh(e.docs.est.t));
       return '<div class="item gp" data-n="'+esc(k)+'" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn ghost" data-act="abrirPac" data-v="'+esc(k)+'" style="flex:1 1 200px;text-align:left;justify-content:flex-start"><span><b>'+esc(e.nombre)+'</b><br><small style="font-weight:400;color:var(--muted)">'+esc(dd.join(' · '))+'</small></span></button><button type="button" class="btn ghost sm" data-act="borrarPac" data-v="'+esc(k)+'">Borrar</button></div>'; }).join('')+'</div></div>';
   var bu=$('gBus'); if(bu) bu.oninput=function(){ var q=claveP(bu.value), it=el.querySelectorAll('.gp'); for(var i=0;i<it.length;i++) it[i].hidden=q&&it[i].getAttribute('data-n').indexOf(q)<0; };
 }
@@ -433,11 +469,25 @@ VIEW.receta=function(){ var r=S.receta;
   '<div class="card"><h3>Rescates</h3><p class="hint">Dosis extra para cuando aparece un síntoma. Agregue todos los que necesite.</p>'+
     r.resc.map(function(m,i){ return rescCard('receta.resc',i); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="receta.resc">+ Agregar rescate</button></div>'+
-  '<div class="card"><h3>Estudios</h3><p class="hint">Toque los que quiera solicitar. Si no pide estudios, déjelo vacío.</p>'+checks('receta.est',EST)+
-    '<div class="fields" style="margin-top:6px">'+fA('receta.estO','Otros estudios o especificaciones',{op:'opcional, uno por renglón',rows:2,ph:'p. ej. Tomografía de abdomen con contraste; marcador CA 19-9'})+
-    fT('receta.estDx','Diagnóstico o motivo del estudio',{c:'w2',op:'opcional',ph:'p. ej. control de función renal'})+'</div>'+
-    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" data-k="receta.estAy" data-b="1"'+(r.estAy?' checked':'')+'> Acudir en ayuno de 8 horas</label></div>'+
   '<div class="card"><h3>Recomendaciones</h3><div class="fields">'+fA('receta.recom','Recomendaciones generales',{op:'opcional',rows:3})+fT('receta.cita','Próxima cita',{c:'w2',op:'opcional',ph:'p. ej. en 15 días o lunes 3 de noviembre'})+'</div></div>';
+};
+function imgCard(i){ var p='est.img.'+i, m=getP(p), sinReg=/Electrocardiograma|Ecocardiograma|Holter|Espirometr|Densitometr|Mastograf|Colonoscop/.test(m.tipo);
+  return '<div class="item"><div class="item-h"><b><span class="no">'+(i+1)+'</span>Estudio de imagen o gabinete</b><button type="button" class="btn del" data-act="del" data-k="est.img" data-i="'+i+'">Quitar</button></div><div class="fields">'+
+    fS(p+'.tipo','Estudio',EST_IMG,{re:1,c:'w2'})+(m.tipo==='Otro'?fT(p+'.otro','Escriba el estudio',{c:'w2'}):'')+
+    (sinReg?'':fT(p+'.region','Región',{c:'w2',ph:'p. ej. abdomen y pelvis; tórax PA y lateral'}))+
+    (/Tomograf|Resonancia/.test(m.tipo)?fS(p+'.contr','Contraste',EST_CONTR,{c:'w2'}):'')+
+    fT(p+'.nota','Detalle o pregunta clínica',{c:'w4',op:'opcional',ph:'p. ej. descartar metástasis óseas; buscar derrame pleural'})+'</div></div>'; }
+VIEW.est=function(){ var d=S.est;
+  return ptCard(true)+
+  '<div class="card"><h3>Fecha y prioridad</h3><div class="fields">'+fT('est.fecha','Fecha',{type:'date'})+'</div><p class="hint" style="margin:10px 0 4px">Prioridad</p>'+chips('est.urg',['Ordinario','Urgente'],'seg')+'</div>'+
+  '<div class="card"><h3>1. Laboratorio</h3><p class="hint">Toque los que necesite.</p>'+
+    EST_LAB.map(function(g){ return '<p class="hint" style="margin:10px 0 4px"><b>'+esc(g[0])+'</b></p>'+checks('est.lab',g[1]); }).join('')+
+    '<div class="fields" style="margin-top:8px">'+fA('est.labO','Otros estudios o especificaciones',{op:'opcional, uno por renglón',rows:2,ph:'p. ej. CA 19-9 y CEA; niveles de digoxina'})+'</div></div>'+
+  '<div class="card"><h3>2. Imagen y gabinete</h3>'+(d.img.length?'':'<p class="hint">Si no pide estudios de imagen, déjelo así.</p>')+d.img.map(function(m,i){ return imgCard(i); }).join('')+
+    '<button type="button" class="btn add" data-act="add" data-k="est.img">+ Agregar estudio de imagen o gabinete</button></div>'+
+  '<div class="card"><h3>3. Datos clínicos</h3><div class="fields">'+fT('est.dx','Diagnóstico',{c:'w4',ph:'Si lo deja vacío se usa el del paciente'})+fA('est.motivo','Motivo del estudio o resumen clínico',{op:'opcional',rows:2,ph:'p. ej. control de función renal por uso de opioides; dolor óseo nuevo en columna lumbar'})+'</div></div>'+
+  '<div class="card"><h3>4. Preparación e indicaciones</h3><label style="display:flex;gap:8px;align-items:center;min-height:44px"><input type="checkbox" data-k="est.ayuno" data-b="1"'+(d.ayuno?' checked':'')+' style="width:22px;height:22px"> Acudir en ayuno de 8 horas</label>'+
+    '<div class="fields" style="margin-top:6px">'+fA('est.obs','Otras indicaciones',{op:'opcional',rows:2,ph:'p. ej. traer estudios previos; tomar sus medicamentos con poca agua'})+'</div></div>';
 };
 VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
   var h='<div class="card"><h3>¿Dónde está el paciente?</h3>'+chips('ind.amb',[['dom','En su domicilio'],['hosp','Hospitalizado']],'seg')+'</div>'+ptCard(true)+
@@ -611,7 +661,7 @@ function renderHome(){
 function renderMod(keep){
   var y=window.scrollY, det=$('ptDet'), ab=det?det.open:null;
   $('modTitle').textContent=mod(cur).t;
-  $('modBody').innerHTML=VIEW[cur]()+'<div class="row" style="margin-top:16px"><button type="button" class="btn ghost sm" data-act="limpiar">Borrar este documento</button></div>';
+  $('modBody').innerHTML=VIEW[cur]()+'<div class="card" id="firmaBox">'+htmlFirma()+'</div><div class="row" style="margin-top:16px"><button type="button" class="btn ghost sm" data-act="limpiar">Borrar este documento</button></div>';
   if(keep){ var d2=$('ptDet'); if(d2&&ab!==null) d2.open=ab; window.scrollTo(0,y); }
   prev();
 }
@@ -619,12 +669,12 @@ function route(){
   var m=/^#\/(\w+)/.exec(location.hash), id=m&&mod(m[1])?m[1]:null;
   cur=id; $('pdfMsg').textContent=''; $('pdfMsg').className='msg';
   $('homeView').hidden=!!id; $('modView').hidden=!id;
-  if(id){ renderMod(false); pintarFirma(); window.scrollTo(0,0); precargar(); } else renderHome();
+  if(id){ renderMod(false); window.scrollTo(0,0); precargar(); } else renderHome();
 }
 window.addEventListener('hashchange',route);
 function pintarFirma(err){ var b=$('firmaBox'); if(b) b.innerHTML=htmlFirma(); if(err) msg(err,true); }
 document.head.insertAdjacentHTML('beforeend','<style>'+FIRMA_CSS+'</style>');
-enlazarFirma($('firmaBox'),pintarFirma);
+enlazarFirma($('modBody'),pintarFirma);
 
 /* ---------- eventos ---------- */
 function onField(e){
@@ -649,7 +699,7 @@ document.addEventListener('click',function(e){
   if(a==='pdf'){ generar(); return; }
   if(a==='set'){ setP(k,v); renderMod(true); return; }
   if(a==='fill'){ setP(k,v); if(cur) renderMod(true); else renderHome(); return; }
-  if(a==='add'){ var arr=getP(k); arr.push(/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:/neb$/.test(k)?{med:'',dosis:'',dil:'',frec:'',con:''}:nuevoMed()); guardar(); renderMod(true);
+  if(a==='add'){ var arr=getP(k); arr.push(/^est\.img$/.test(k)?{tipo:'',otro:'',region:'',contr:'',nota:''}:/resc$/.test(k)?nuevoResc():/sol$/.test(k)?{tipo:'',vol:'',via:'',tiempo:'',extra:''}:/neb$/.test(k)?{med:'',dosis:'',dil:'',frec:'',con:''}:nuevoMed()); guardar(); renderMod(true);
     var items=$('modBody').querySelectorAll('[data-k^="'+k+'.'+(arr.length-1)+'."]'); if(items[0]){ items[0].scrollIntoView({block:'center'}); try{ items[0].focus({preventScroll:true}); }catch(x){} } return; }
   if(a==='del'){ getP(k).splice(+b.getAttribute('data-i'),1); guardar(); renderMod(true); return; }
   if(a==='abrirPac'){ abrirPac(v); renderHome(); var t=$('ptHome'); if(t) t.scrollIntoView({block:'start'}); return; }
@@ -685,11 +735,12 @@ function generar(){
     if(!d){ msg('No se pudo crear el PDF en este navegador.',true); return; }
     guardarPac(cur);
     guardarPDF(d);
-    if(cur==='receta'||cur==='ind') $('pdfMsg').textContent+=' Quedó guardada con el nombre del paciente para la siguiente consulta.';
+    if(cur==='receta'||cur==='ind'||cur==='est') $('pdfMsg').textContent+=' Quedó guardada con el nombre del paciente para la siguiente consulta.';
   },function(){ msg('No se pudo descargar el formato. Revise su conexión e intente de nuevo.',true); });
 }
 function validar(){
-  if(cur==='receta'&&!S.receta.meds.some(function(m){ return trim(m.nom); })&&!S.receta.resc.some(function(m){ return trim(m.nom); })&&!(S.receta.est||[]).length&&!trim(S.receta.estO)) return 'Escriba al menos un medicamento o un estudio.';
+  if(cur==='receta'&&!S.receta.meds.some(function(m){ return trim(m.nom); })&&!S.receta.resc.some(function(m){ return trim(m.nom); })) return 'Escriba al menos un medicamento.';
+  if(cur==='est'&&!S.est.lab.length&&!trim(S.est.labO)&&!S.est.img.some(function(m){ return m.tipo; })) return 'Marque al menos un estudio.';
   if(!trim(S.pt.nombre)) return 'Falta el nombre del paciente.';
   if(cur==='def'&&!trim(S.def.cbas)&&!trim(S.def.ca)&&!S.def.edit) return 'Escriba la causa de la defunción.';
   return '';
@@ -851,13 +902,23 @@ PDF.receta=function(){ var r=S.receta, G=hoja('RECETA MÉDICA',fCorta(r.fecha));
   var meds=r.meds.filter(function(m){ return trim(m.nom); }), resc=r.resc.filter(function(m){ return trim(m.nom)||trim(m.sint); });
   if(meds.length){ G.banda('Medicamentos'); meds.forEach(function(m,i){ tarjetaMed(G,m,i+1); }); G.y+=4; }
   if(resc.length){ G.banda('Rescates: sólo si se necesitan',G.C.RES); resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); }); G.y+=4; }
-  var est=EST.filter(function(x){ return (r.est||[]).indexOf(x)>=0; }).concat(lineas(r.estO));
-  if(est.length){ G.banda('Estudios solicitados'); est.forEach(function(x){ G.li(x); });
-    if(trim(r.estDx)){ G.y+=2; G.parrafo([{t:'Diagnóstico o motivo: ',b:1,c:G.C.PLUM},{t:trim(r.estDx)}]); }
-    if(r.estAy){ G.y+=2; G.parrafo([{t:'Acudir en ayuno de 8 horas.',b:1}]); }
-    G.y+=4; }
   if(trim(r.recom)){ G.banda('Recomendaciones'); lineas(r.recom).forEach(function(l){ G.li(l); }); }
   if(trim(r.cita)){ G.y+=4; G.parrafo([{t:'Próxima cita: ',b:1,c:G.C.PLUM},{t:trim(r.cita)}]); }
+  G.firma(); return G.fin();
+};
+PDF.est=function(){ var o=S.est, G=hoja('SOLICITUD DE ESTUDIOS',fCorta(o.fecha));
+  G.titulo('Solicitud de estudios',o.urg==='Urgente'?'Prioridad: URGENTE':'Prioridad: ordinaria');
+  pacCeldas(G,{dx:false});
+  G.celdas([['Diagnóstico',trim(o.dx)||S.pt.dx,1]]);
+  var lab=[]; EST_LAB.forEach(function(g){ g[1].forEach(function(x){ if(o.lab.indexOf(x)>=0) lab.push(x); }); }); lab=lab.concat(lineas(o.labO));
+  var n=0, sec=function(t){ n++; G.banda(n+'. '+t); };
+  if(lab.length){ sec('Laboratorio'); lab.forEach(function(x){ G.li(x); }); G.y+=4; }
+  var img=o.img.filter(function(m){ return m.tipo; });
+  if(img.length){ sec('Imagen y gabinete'); img.forEach(function(m){ var nm=m.tipo==='Otro'?(trim(m.otro)||'Otro estudio'):m.tipo;
+    G.li([{t:nm+(trim(m.region)?' de '+low1(trim(m.region)):''),b:1},{t:(m.contr&&/Tomograf|Resonancia/.test(m.tipo)?', '+low1(m.contr):'')+'.'+(trim(m.nota)?' '+trim(m.nota)+(/[.!?]$/.test(trim(m.nota))?'':'.'):'')}]); }); G.y+=4; }
+  if(trim(o.motivo)){ sec('Datos clínicos'); lineas(o.motivo).forEach(function(x){ G.parrafo([{t:x}]); }); G.y+=4; }
+  var pre=[]; if(o.ayuno) pre.push('Acudir en ayuno de 8 horas.'); pre=pre.concat(lineas(o.obs));
+  if(pre.length){ sec('Preparación e indicaciones'); pre.forEach(function(x){ G.li(x); }); G.y+=4; }
   G.firma(); return G.fin();
 };
 PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICAS',fCorta(o.fecha)+(o.hora?' '+o.hora:''));

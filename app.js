@@ -24,17 +24,42 @@ function procesarFirma(file,cb){
   }; im.onerror=function(){ cb(false); }; im.src=fr.result; };
   fr.onerror=function(){ cb(false); }; fr.readAsDataURL(file);
 }
+function padFirma(cb){
+  var ov=document.createElement('div'); ov.className='firmapad';
+  ov.innerHTML='<div class="fpbox"><b>Firme con el dedo dentro del recuadro</b><canvas></canvas><div class="fpbtns"><button type="button" class="btn ghost sm" data-fp="borrar">Borrar</button><button type="button" class="btn ghost sm" data-fp="cancelar">Cancelar</button><button type="button" class="btn sm" data-fp="ok">Guardar firma</button></div></div>';
+  document.body.appendChild(ov);
+  var cv=ov.querySelector('canvas'), r=window.devicePixelRatio||1, W=Math.min(560,window.innerWidth-72), H=Math.round(W*0.45);
+  cv.style.width=W+'px'; cv.style.height=H+'px'; cv.width=W*r; cv.height=H*r;
+  var x=cv.getContext('2d'); x.scale(r,r); x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='rgb(24,30,64)'; x.lineWidth=2.6;
+  var dib=false, hay=false, lx=0, ly=0;
+  var pos=function(e){ var b=cv.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; };
+  cv.addEventListener('pointerdown',function(e){ e.preventDefault(); dib=true; try{ cv.setPointerCapture(e.pointerId); }catch(z){} var q=pos(e); lx=q[0]; ly=q[1]; x.beginPath(); x.arc(lx,ly,1.2,0,7); x.fillStyle=x.strokeStyle; x.fill(); hay=true; });
+  cv.addEventListener('pointermove',function(e){ if(!dib) return; e.preventDefault(); var q=pos(e); x.beginPath(); x.moveTo(lx,ly); x.lineTo(q[0],q[1]); x.stroke(); lx=q[0]; ly=q[1]; });
+  var fin=function(){ dib=false; }; cv.addEventListener('pointerup',fin); cv.addEventListener('pointercancel',fin);
+  cv.style.touchAction='none';
+  ov.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-fp]'); if(!t) return; var a=t.getAttribute('data-fp');
+    if(a==='borrar'){ x.clearRect(0,0,W,H); hay=false; return; }
+    if(a==='cancelar'){ ov.remove(); cb(); return; }
+    if(a==='ok'){ if(!hay){ ov.remove(); cb(); return; }
+      var D=x.getImageData(0,0,cv.width,cv.height), p=D.data, x0=cv.width, x1=-1, y0=cv.height, y1=-1;
+      for(var i=3;i<p.length;i+=4){ if(p[i]>40){ var px=((i-3)/4)%cv.width, py=Math.floor((i-3)/4/cv.width); if(px<x0)x0=px; if(px>x1)x1=px; if(py<y0)y0=py; if(py>y1)y1=py; } }
+      if(x1<0){ ov.remove(); cb(); return; }
+      x0=Math.max(0,x0-8); y0=Math.max(0,y0-8); x1=Math.min(cv.width-1,x1+8); y1=Math.min(cv.height-1,y1+8);
+      var o=document.createElement('canvas'); o.width=x1-x0+1; o.height=y1-y0+1; o.getContext('2d').drawImage(cv,x0,y0,o.width,o.height,0,0,o.width,o.height);
+      try{ localStorage.setItem(FIRMA_K,o.toDataURL('image/png')); setFirmar(true); ov.remove(); cb(); }catch(z){ ov.remove(); cb('No se pudo guardar la firma.'); } } });
+}
 function dibujarFirma(d,cx,yLinea){ var u=firmaImg(); if(!u||!firmarOn()) return;
   try{ var pr=d.getImageProperties(u), w=130, h=w*pr.height/pr.width; if(h>64){ h=64; w=h*pr.width/pr.height; } d.addImage(u,'PNG',cx-w/2,yLinea-h+8,w,h,'firma'); }catch(e){} }
 function htmlFirma(){ var u=firmaImg();
-  if(!u) return '<div class="firmabox"><label class="btn ghost sm firmaadd">Agregar mi firma al PDF<input type="file" accept="image/*" data-firma="subir" hidden></label><span class="firmahint">Foto de la firma en hoja blanca. Se guarda sólo en este dispositivo.</span></div>';
-  return '<div class="firmabox"><label class="firmachk"><input type="checkbox" data-firma="on"'+(firmarOn()?' checked':'')+'> Firmar el PDF</label><img src="'+u+'" alt="Firma" class="firmaimg"><label class="btn ghost sm">Cambiar<input type="file" accept="image/*" data-firma="subir" hidden></label><button type="button" class="btn ghost sm" data-firma="quitar">Quitar</button></div>'; }
-var FIRMA_CSS='.firmabox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px}.firmabox .firmaimg{height:40px;max-width:120px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}.firmachk{display:flex;gap:8px;align-items:center;font-weight:700;min-height:44px}.firmachk input{width:22px;height:22px}.firmahint{font-size:.82rem;color:var(--muted);flex:1 1 180px}.firmaadd{cursor:pointer}';
+  if(!u) return '<div class="firmabox"><b style="flex:1 1 100%">Firma en el PDF</b><button type="button" class="btn ghost sm" data-firma="dibujar">Dibujar mi firma</button><label class="btn ghost sm firmaadd">Subir foto de la firma<input type="file" accept="image/*" data-firma="subir" hidden></label><span class="firmahint">Se hace una sola vez y se guarda sólo en este dispositivo.</span></div>';
+  return '<div class="firmabox"><label class="firmachk"><input type="checkbox" data-firma="on"'+(firmarOn()?' checked':'')+'> Firmar el PDF</label><img src="'+u+'" alt="Firma" class="firmaimg"><button type="button" class="btn ghost sm" data-firma="dibujar">Volver a dibujar</button><label class="btn ghost sm">Subir foto<input type="file" accept="image/*" data-firma="subir" hidden></label><button type="button" class="btn ghost sm" data-firma="quitar">Quitar</button></div>'; }
+var FIRMA_CSS='.firmabox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px}.firmabox .firmaimg{height:40px;max-width:120px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}.firmachk{display:flex;gap:8px;align-items:center;font-weight:700;min-height:44px}.firmachk input{width:22px;height:22px}.firmahint{font-size:.82rem;color:var(--muted);flex:1 1 180px}.firmaadd{cursor:pointer}.firmapad{position:fixed;inset:0;z-index:999;background:rgba(20,14,30,.55);display:grid;place-items:center;padding:16px}.firmapad .fpbox{background:var(--surface,#fff);border-radius:16px;padding:16px;display:grid;gap:10px;max-width:100%}.firmapad canvas{background:#fff;border:2px dashed #b9a6cc;border-radius:12px;display:block}.firmapad .fpbtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}';
 function enlazarFirma(raiz,alCambiar){
   raiz.addEventListener('change',function(e){ var t=e.target, f=t.getAttribute&&t.getAttribute('data-firma'); if(!f) return;
     if(f==='on'){ setFirmar(t.checked); alCambiar(); }
     if(f==='subir'&&t.files&&t.files[0]) procesarFirma(t.files[0],function(ok){ alCambiar(ok?'':'No se pudo leer la imagen de la firma.'); }); });
-  raiz.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('[data-firma="quitar"]'); if(!t) return;
+  raiz.addEventListener('click',function(e){ var dz=e.target.closest&&e.target.closest('[data-firma="dibujar"]'); if(dz){ padFirma(function(err){ alCambiar(err||''); }); return; }
+    var t=e.target.closest&&e.target.closest('[data-firma="quitar"]'); if(!t) return;
     if(!t.classList.contains('arm')){ t.classList.add('arm'); t.textContent='Toque otra vez'; setTimeout(function(){ if(t.isConnected){ t.classList.remove('arm'); t.textContent='Quitar'; } },3500); return; }
     quitarFirma(); alCambiar(); });
 }
@@ -570,6 +595,6 @@ function copiar(t,msg){
 }
 
 /* ---------- arranque ---------- */
-(function(){ if(/github\.io$/.test(location.hostname)) return; var t=document.querySelector('a.tile[href*="/documentos/"]'); if(t){ t.target='_blank'; t.rel='noopener'; } })();
+(function(){ if(/github\.io$/.test(location.hostname)) return; var ts=document.querySelectorAll('a.tile[href*="/documentos/"]'); for(var i=0;i<ts.length;i++){ ts[i].target='_blank'; ts[i].rel='noopener'; } })();
 fillCard(); renderTiles(); route();
 })();
