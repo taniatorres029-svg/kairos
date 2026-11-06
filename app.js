@@ -570,5 +570,6 @@ function copiar(t,msg){
 }
 
 /* ---------- arranque ---------- */
+(function(){ if(/github\.io$/.test(location.hostname)) return; var t=document.querySelector('a.tile[href*="/documentos/"]'); if(t){ t.target='_blank'; t.rel='noopener'; } })();
 fillCard(); renderTiles(); route();
 })();
