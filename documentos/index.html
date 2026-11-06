@@ -227,6 +227,7 @@ var GEN={
 };
 var GER=['Prevención de delirium: orientarlo en tiempo y lugar cada turno, con reloj y calendario a la vista','Respetar el sueño: luz apagada y sin tomas de signos ni medicamentos innecesarios de 23 a 6 h','Lentes, aparatos auditivos y prótesis dental a su alcance','Vigilar delirium por turno (CAM); avisar si hay un cambio brusco en la atención o el estado de alerta','Evitar la sujeción física; si es indispensable, con indicación médica y revaloración cada 2 horas','Prevención de caídas: barandales arriba, cama baja, timbre a la mano y calzado antiderrapante; levantarlo siempre acompañado','Movilización temprana: sentarlo en el sillón y caminar acompañado 3 veces al día, si su estado lo permite','Cambios de posición cada 2 horas y escala de Braden por turno','Precauciones de aspiración: sentado a 90 grados para comer; valorar la deglución antes de iniciar la vía oral','Higiene bucal 3 veces al día','Profilaxis de trombosis según riesgo (Padua) y riesgo de sangrado','Conciliación de medicamentos: revisar polifarmacia y suspender los potencialmente inapropiados (criterios STOPP / Beers)','Evitar benzodiacepinas, anticolinérgicos y antihistamínicos de primera generación','Acompañamiento de un familiar las 24 horas para orientación y apoyo','Planear el egreso desde el ingreso: cuidador, equipo en casa (cama, oxígeno, silla) y seguimiento'];
 var LAB=['Biometría hemática','Química sanguínea (glucosa, urea, creatinina)','Electrolitos séricos (Na, K, Cl, Ca, Mg, P)','Pruebas de función hepática','Albúmina','Tiempos de coagulación','Examen general de orina','Gasometría','Radiografía de tórax','Electrocardiograma'];
+var EST=['Biometría hemática','Química sanguínea (glucosa, urea, creatinina)','Electrolitos séricos (Na, K, Cl, Ca, Mg, P)','Pruebas de función hepática','Albúmina','Tiempos de coagulación','Examen general de orina','Hemoglobina glucosilada (HbA1c)','Perfil tiroideo (TSH, T4 libre)','Vitamina B12 y ácido fólico','Vitamina D','Ferritina y perfil de hierro','Radiografía de tórax','Ultrasonido abdominal','Tomografía','Resonancia magnética','Electrocardiograma'];
 var VOLTIPO=['Expresadas verbalmente','Firmadas en documento de voluntad anticipada','Firmadas ante notario'];
 var VOL=['No reanimación cardiopulmonar (no RCP)','No intubación ni ventilación mecánica','No traslado a terapia intensiva','No traslado a urgencias ni al hospital: atención en casa','Evitar medidas invasivas o desproporcionadas','Desea morir en su domicilio','Sedación paliativa si hay síntomas refractarios'];
 var O2DEV=['Puntas nasales','Mascarilla simple','Mascarilla con reservorio','Mascarilla Venturi','Cánula nasal de alto flujo','Ventilación no invasiva (CPAP / BiPAP)','Otro'];
@@ -258,7 +259,7 @@ var ICON={
  def:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-3-7-6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4-3 7-7 10z"/><path d="M12 8v8"/></svg>'
 };
 var MODS=[
- {id:'receta',t:'Receta médica',d:'Medicamentos en formato fácil: dosis, para qué es, cómo y cuánto tiempo. Con rescates.',hdr:'RECETA MÉDICA',arch:'Receta'},
+ {id:'receta',t:'Receta médica',d:'Medicamentos en formato fácil (dosis, para qué es, cómo y cuánto tiempo), rescates y solicitud de estudios.',hdr:'RECETA MÉDICA',arch:'Receta'},
  {id:'ind',t:'Indicaciones médicas',d:'Domicilio u hospital: dieta, soluciones, medicamentos, rescates, medidas generales y de confort.',hdr:'INDICACIONES MÉDICAS',arch:'Indicaciones'},
  {id:'cons',t:'Constancia médica',d:'Para el familiar que trabaja o viene de otro país, o para el paciente.',hdr:'CONSTANCIA MÉDICA',arch:'Constancia'},
  {id:'res',t:'Resumen médico',d:'Resumen breve para su médico tratante o para lo que el paciente necesite.',hdr:'RESUMEN MÉDICO',arch:'Resumen'},
@@ -313,7 +314,7 @@ function base(){
   var f=hoyISO();
   return {
     pt:{nombre:'',edad:'',sexo:'',peso:'',talla:'',dx:'',alergias:''},
-    receta:{fecha:f,meds:[nuevoMed()],resc:[],recom:'',cita:''},
+    receta:{fecha:f,est:[],estO:'',estDx:'',estAy:false,meds:[nuevoMed()],resc:[],recom:'',cita:''},
     ind:{amb:'dom',fecha:f,hora:ahora(),ciudad:'',hosp:'',cama:'',vol:[],o2dev:'',o2flujo:'',o2fio2:'',o2modo:'',o2meta:'',o2nota:'',neb:[],volO:'',volRep:'',volTipo:'',evtA:'Dra. Gabriela Alejandra López Ortiz',evtTel:'311 204 87 63',fallece:[],falleceO:'',ger:[],lab:[],dieta:'',dietaO:'',sol:[],meds:[nuevoMed()],resc:[],gen:[],genO:'',conf:[],confO:'',alarma:[],alarmaO:'',activ:'',estudios:'',otras:''},
     cons:{fecha:f,lugar:'Guadalajara, Jalisco',para:'fam_trab',dest:'A quien corresponda',inclDx:true,estado:['avanzada','cuid'],desde:'',fam:'',parent:'',pais:'',inicio:f,periodo:'',extra:'',ingles:false,dxEn:'',edit:false,texto:'',textoEn:''},
     res:{fecha:f,lugar:'Guadalajara, Jalisco',dest:'',motivo:'',dxs:'',ant:'',evol:'',estado:'',estudios:'',tx:'',plan:'',pron:''},
@@ -377,7 +378,7 @@ function checks(p,opts){ var v=getP(p)||[];
 function ptCard(compacto){
   var p=S.pt;
   var campos='<div class="fields">'+fT('pt.nombre','Nombre completo',{c:'w2'})+fT('pt.edad','Edad (años)',{type:'number',im:'numeric'})+
-    fS('pt.sexo','Sexo',[['F','Mujer'],['M','Hombre']])+fT('pt.peso','Peso (kg)',{type:'number',im:'decimal',op:'si aplica'})+fT('pt.talla','Talla (cm)',{type:'number',im:'decimal',op:'si aplica'})+
+    fS('pt.sexo','Sexo',[['F','Mujer'],['M','Hombre']])+(cur==='ind'?'':fT('pt.peso','Peso (kg)',{type:'number',im:'decimal',op:'si aplica'})+fT('pt.talla','Talla (cm)',{type:'number',im:'decimal',op:'si aplica'}))+
     fT('pt.dx','Diagnóstico principal',{c:'w2',ph:'p. ej. cáncer de páncreas etapa IV'})+fT('pt.alergias','Alergias',{c:'w2',ph:'p. ej. penicilina'})+'</div>'+
     '<div class="chips" style="margin-top:8px"><button type="button" class="chip mini" data-act="fill" data-k="pt.alergias" data-v="Negadas">Alergias negadas</button></div>';
   if(!compacto) return '<div class="card">'+campos+'<div class="row" style="margin-top:12px"><button type="button" class="btn ghost sm" data-act="nuevo">Nuevo paciente</button></div></div>';
@@ -432,6 +433,10 @@ VIEW.receta=function(){ var r=S.receta;
   '<div class="card"><h3>Rescates</h3><p class="hint">Dosis extra para cuando aparece un síntoma. Agregue todos los que necesite.</p>'+
     r.resc.map(function(m,i){ return rescCard('receta.resc',i); }).join('')+
     '<button type="button" class="btn add" data-act="add" data-k="receta.resc">+ Agregar rescate</button></div>'+
+  '<div class="card"><h3>Estudios</h3><p class="hint">Toque los que quiera solicitar. Si no pide estudios, déjelo vacío.</p>'+checks('receta.est',EST)+
+    '<div class="fields" style="margin-top:6px">'+fA('receta.estO','Otros estudios o especificaciones',{op:'opcional, uno por renglón',rows:2,ph:'p. ej. Tomografía de abdomen con contraste; marcador CA 19-9'})+
+    fT('receta.estDx','Diagnóstico o motivo del estudio',{c:'w2',op:'opcional',ph:'p. ej. control de función renal'})+'</div>'+
+    '<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" data-k="receta.estAy" data-b="1"'+(r.estAy?' checked':'')+'> Acudir en ayuno de 8 horas</label></div>'+
   '<div class="card"><h3>Recomendaciones</h3><div class="fields">'+fA('receta.recom','Recomendaciones generales',{op:'opcional',rows:3})+fT('receta.cita','Próxima cita',{c:'w2',op:'opcional',ph:'p. ej. en 15 días o lunes 3 de noviembre'})+'</div></div>';
 };
 VIEW.ind=function(){ var d=S.ind, dom=d.amb==='dom';
@@ -684,7 +689,7 @@ function generar(){
   },function(){ msg('No se pudo descargar el formato. Revise su conexión e intente de nuevo.',true); });
 }
 function validar(){
-  if(cur==='receta'&&!S.receta.meds.some(function(m){ return trim(m.nom); })&&!S.receta.resc.some(function(m){ return trim(m.nom); })) return 'Escriba al menos un medicamento.';
+  if(cur==='receta'&&!S.receta.meds.some(function(m){ return trim(m.nom); })&&!S.receta.resc.some(function(m){ return trim(m.nom); })&&!(S.receta.est||[]).length&&!trim(S.receta.estO)) return 'Escriba al menos un medicamento o un estudio.';
   if(!trim(S.pt.nombre)) return 'Falta el nombre del paciente.';
   if(cur==='def'&&!trim(S.def.cbas)&&!trim(S.def.ca)&&!S.def.edit) return 'Escriba la causa de la defunción.';
   return '';
@@ -781,7 +786,8 @@ function hoja(hdr,fechaTxt){
 }
 function pacCeldas(G,o){ var p=S.pt; o=o||{};
   var sx=p.sexo==='F'?'Mujer':p.sexo==='M'?'Hombre':'';
-  G.celdas([['Paciente',p.nombre,0.48],['Edad',p.edad?p.edad+' años':'',0.13],['Sexo',sx,0.13],['Peso',p.peso?p.peso+' kg':'',0.13],['Talla',p.talla?p.talla+' cm':'',0.13]]);
+  if(o.sinPT) G.celdas([['Paciente',p.nombre,0.62],['Edad',p.edad?p.edad+' años':'',0.19],['Sexo',sx,0.19]]);
+  else G.celdas([['Paciente',p.nombre,0.48],['Edad',p.edad?p.edad+' años':'',0.13],['Sexo',sx,0.13],['Peso',p.peso?p.peso+' kg':'',0.13],['Talla',p.talla?p.talla+' cm':'',0.13]]);
   G.celdas([['Diagnóstico',o.dx===false?'':p.dx,0.64],['Alergias',p.alergias||'No referidas',0.36]]);
 }
 /* tarjeta de medicamento en formato fácil */
@@ -845,13 +851,18 @@ PDF.receta=function(){ var r=S.receta, G=hoja('RECETA MÉDICA',fCorta(r.fecha));
   var meds=r.meds.filter(function(m){ return trim(m.nom); }), resc=r.resc.filter(function(m){ return trim(m.nom)||trim(m.sint); });
   if(meds.length){ G.banda('Medicamentos'); meds.forEach(function(m,i){ tarjetaMed(G,m,i+1); }); G.y+=4; }
   if(resc.length){ G.banda('Rescates: sólo si se necesitan',G.C.RES); resc.forEach(function(m,i){ tarjetaResc(G,m,i+1); }); G.y+=4; }
+  var est=EST.filter(function(x){ return (r.est||[]).indexOf(x)>=0; }).concat(lineas(r.estO));
+  if(est.length){ G.banda('Estudios solicitados'); est.forEach(function(x){ G.li(x); });
+    if(trim(r.estDx)){ G.y+=2; G.parrafo([{t:'Diagnóstico o motivo: ',b:1,c:G.C.PLUM},{t:trim(r.estDx)}]); }
+    if(r.estAy){ G.y+=2; G.parrafo([{t:'Acudir en ayuno de 8 horas.',b:1}]); }
+    G.y+=4; }
   if(trim(r.recom)){ G.banda('Recomendaciones'); lineas(r.recom).forEach(function(l){ G.li(l); }); }
   if(trim(r.cita)){ G.y+=4; G.parrafo([{t:'Próxima cita: ',b:1,c:G.C.PLUM},{t:trim(r.cita)}]); }
   G.firma(); return G.fin();
 };
 PDF.ind=function(){ var o=S.ind, dom=o.amb==='dom', G=hoja('INDICACIONES MÉDICAS',fCorta(o.fecha)+(o.hora?' '+o.hora:''));
   G.titulo(dom?'Indicaciones médicas en domicilio':'Indicaciones médicas hospitalarias',dom?'Medicina del Dolor y Cuidados Paliativos':(trim(o.hosp)||'Medicina del Dolor y Cuidados Paliativos'));
-  pacCeldas(G);
+  pacCeldas(G,{sinPT:true});
   G.celdas([['Ciudad',o.ciudad,0.7],['Cama',dom?'':o.cama,0.3]]);
   var vol=VOL.filter(function(x){ return o.vol.indexOf(x)>=0; }).concat(lineas(o.volO));
   if(vol.length||trim(o.volRep)||o.volTipo) cuadroVol(G,vol,trim(o.volRep),dom,o.volTipo);
