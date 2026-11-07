@@ -1,3 +1,4 @@
+/** @OnlyCurrentDoc */
 // Guarda cada solicitud del formulario /factura en la hoja "Facturas".
 // Instalar: en la hoja de Google, Extensiones > Apps Script, pegar este archivo,
 // Implementar > Nueva implementación > Aplicación web
