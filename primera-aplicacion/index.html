@@ -56,7 +56,7 @@ b{color:var(--navy)}
 .chips span{background:var(--paper);border-radius:999px;padding:7px 13px;font-weight:800;font-size:16px;color:var(--navy)}
 .note{display:flex;gap:10px;align-items:center;background:var(--sand);border-radius:16px;padding:12px 14px;font-size:17px;color:var(--navy)}
 .vlist{display:flex;flex-direction:column}
-.vrow{display:flex;gap:14px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.vrow{display:flex;gap:14px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}
 .vrow input{position:absolute;opacity:0;pointer-events:none}
 .cb{width:30px;height:30px;flex:none;border:2.5px solid var(--navy);border-radius:8px;display:grid;place-items:center;background:var(--paper)}
 .vrow input:checked + .cb{background:var(--navy)}
@@ -152,7 +152,7 @@ b{color:var(--navy)}
   <footer class="pf"><span>Dra. Tania Torres</span><span>10</span></footer>
 </section><section class="leaf " id="vacunas" aria-label="Tus vacunas">
   <header class="ph"><div><p class="tag">Vacunas</p><h2>Tus vacunas</h2></div><span class="big" aria-hidden="true">💉</span></header>
-  <p class="intro">Con palomita ✔ las que te tocan. Con estrella ⭐ las que no deben faltar.</p><div class="vlist"><label class="vrow" for="vac1"><input type="checkbox" id="vac1" data-v="1"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Influenza</b><small><em>Todas las edades</em> · cada año</small></span><span class="must"><span>⭐</span><span>Antes o<br>durante</span></span></label><label class="vrow" for="vac2"><input type="checkbox" id="vac2" data-v="2"><span class="cb" aria-hidden="true"></span><span class="vt"><b>COVID-19</b><small><em>Todas las edades</em> · cada temporada</small></span><span class="must"><span>⭐</span><span>Antes o<br>durante</span></span></label><label class="vrow" for="vac3"><input type="checkbox" id="vac3" data-v="3"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Neumococo</b><small><em>Todas las edades</em> · una dosis</small></span><span class="must"><span>⭐</span><span>Antes de<br>empezar</span></span></label><label class="vrow" for="vac4"><input type="checkbox" id="vac4" data-v="4"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Tétanos y tos ferina (Tdap)</b><small><em>Todas las edades</em> · cada 10 años</small></span></label><label class="vrow" for="vac5"><input type="checkbox" id="vac5" data-v="5"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Herpes zóster</b><small><em>Todas las edades</em> · 2 dosis · culebrilla</small></span><span class="must"><span>⭐</span><span>Antes de<br>empezar</span></span></label><label class="vrow" for="vac6"><input type="checkbox" id="vac6" data-v="6"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Hepatitis B</b><small><em>Hasta 59 años</em> · después, según tu caso</small></span></label><label class="vrow" for="vac7"><input type="checkbox" id="vac7" data-v="7"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Virus del papiloma humano</b><small><em>Hasta 26 años</em> · de 27 a 45, según tu caso</small></span></label><label class="vrow" for="vac8"><input type="checkbox" id="vac8" data-v="8"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Virus sincitial respiratorio</b><small><em>50 años o más</em> · una dosis</small></span></label><label class="vrow" for="vac9"><input type="checkbox" id="vac9" data-v="9"><span class="cb" aria-hidden="true"></span><span class="vt"><b>Otra:</b></span></label></div><ul class="tips"><li><span aria-hidden="true">🚫</span><span>Nada de vacunas de virus vivos: sarampión, varicela, fiebre amarilla.</span></li><li><span aria-hidden="true">👨‍👩‍👧</span><span>Que tu familia se vacune contra influenza y COVID-19.</span></li></ul><p class="cta"><span aria-hidden="true">💬</span> Algunas las tengo en el consultorio. Pregúntame si te las puedo poner en tu próxima cita.</p><p class="src">Según las guías de ASCO (2024) y CDC para adultos con cáncer.</p>
+  <p class="intro">Las que recomiendan las guías para ti. Las de estrella ⭐ no deben faltar.</p><div class="vlist"><div class="vrow"><span class="vt"><b>Influenza</b><small><em>Todas las edades</em> · cada año</small></span><span class="must"><span>⭐</span><span>Antes o<br>durante</span></span></div><div class="vrow"><span class="vt"><b>COVID-19</b><small><em>Todas las edades</em> · cada temporada</small></span><span class="must"><span>⭐</span><span>Antes o<br>durante</span></span></div><div class="vrow"><span class="vt"><b>Neumococo</b><small><em>Todas las edades</em> · una dosis</small></span><span class="must"><span>⭐</span><span>Antes de<br>empezar</span></span></div><div class="vrow"><span class="vt"><b>Tétanos y tos ferina (Tdap)</b><small><em>Todas las edades</em> · cada 10 años</small></span></div><div class="vrow"><span class="vt"><b>Herpes zóster</b><small><em>Todas las edades</em> · 2 dosis · culebrilla</small></span><span class="must"><span>⭐</span><span>Antes de<br>empezar</span></span></div><div class="vrow"><span class="vt"><b>Hepatitis B</b><small><em>Hasta 59 años</em> · después, según tu caso</small></span></div><div class="vrow"><span class="vt"><b>Virus del papiloma humano</b><small><em>Hasta 26 años</em> · de 27 a 45, según tu caso</small></span></div><div class="vrow"><span class="vt"><b>Virus sincitial respiratorio</b><small><em>50 años o más</em> · una dosis</small></span></div></div><ul class="tips"><li><span aria-hidden="true">🚫</span><span>Nada de vacunas de virus vivos: sarampión, varicela, fiebre amarilla.</span></li><li><span aria-hidden="true">👨‍👩‍👧</span><span>Que tu familia se vacune contra influenza y COVID-19.</span></li></ul><p class="cta"><span aria-hidden="true">💬</span> Antes de ponerte cualquiera, pregúntame cuándo, para coordinarlo con tu tratamiento. Algunas las tengo en el consultorio.</p><p class="src">Según las guías de ASCO (2024) y del CDC (2025) para adultos con cáncer.</p>
   <footer class="pf"><span>Dra. Tania Torres</span><span>11</span></footer>
 </section><section class="leaf alarm" id="alarma" aria-label="Señales de alarma">
   <header class="ph"><div><p class="tag">Muy importante</p><h2>Señales de alarma</h2></div><span class="big" aria-hidden="true">🚨</span></header>
@@ -217,22 +217,7 @@ b{color:var(--navy)}
     b.addEventListener('click', function () { go(+b.getAttribute('data-go'), true); });
   });
 
-  // Vacunas: la doctora puede mandar el enlace con las vacunas ya marcadas (#v1-3-5).
-  var boxes = document.querySelectorAll('input[data-v]');
-  var key = 'primera-aplicacion-vacunas';
   var hash = (location.hash || '').slice(1);
-  var fromLink = /^v[0-9-]+$/.test(hash) ? hash.slice(1).split('-') : null;
-  var saved = null;
-  try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
-  var marked = fromLink || saved || [];
-  boxes.forEach(function (b) {
-    b.checked = marked.indexOf(b.getAttribute('data-v')) !== -1;
-    b.addEventListener('change', function () {
-      var on = Array.prototype.filter.call(boxes, function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-v'); });
-      try { localStorage.setItem(key, JSON.stringify(on)); } catch (e) {}
-    });
-  });
-  if (fromLink) { try { localStorage.setItem(key, JSON.stringify(fromLink)); } catch (e) {} }
 
   // Abrir en una hoja concreta si el enlace trae su nombre (#alarma, #vacunas…)
   var start = leaves.findIndex(function (l) { return l.id === hash; });
