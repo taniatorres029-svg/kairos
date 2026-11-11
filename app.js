@@ -79,7 +79,7 @@ var META=[
   {id:'pronostico',b:'Pronóstico', t:'Pronóstico de supervivencia', c:'Pronóstico', d:'Elige la escala que aplica y estima la supervivencia.'},
   {id:'opioides',  b:'Rotación de opioides', t:'Rotación de opioides', c:'Opioides', d:'Cambia de opioide con la dosis equivalente segura.'},
   {id:'nutricion', b:'Nutrición', t:'Soporte nutricional', c:'Nutrición', d:'Define metas de energía, proteína y suplemento.'},
-  {id:'sedacion',  b:'Sedación paliativa', t:'Sedación paliativa', c:'Sedación', d:'Prepara la bomba subcutánea paso a paso.'},
+  {id:'sedacion',  b:'Sedación paliativa', t:'Sedación paliativa', c:'Sedación', d:'Prepara la bomba subcutánea o la infusión intravenosa paso a paso.'},
   {id:'nota',      t:'Nota médica y PDF', c:'Nota y PDF', d:'PDF con membrete de cada sección por separado, listo para imprimir o enviar.'}
 ];
 function meta(id){ for(var i=0;i<META.length;i++) if(META[i].id===id) return META[i]; }
@@ -312,7 +312,7 @@ var AYUDA={
 function ayuda(id,doc){
   if(doc.getElementById('alvHelp')) return;
   var d=doc.createElement('div'); d.className='alv-help noprint'; d.id='alvHelp';
-  d.innerHTML='<b>Cómo se llena:</b> '+AYUDA[id]+'<span><i></i>Los campos en lila ya vienen de los datos del paciente. Al terminar, toque «PDF» arriba: sale el PDF con membrete sólo de esta sección.</span>';
+  d.innerHTML='<b>Cómo se llena:</b> '+AYUDA[id]+'<span><i></i>Los campos en lila se comparten: lo que escriba aquí aparece también en las otras herramientas. Al terminar, toque «PDF» arriba: sale el PDF con membrete sólo de esta sección.</span>';
   var h=doc.querySelector('header.top'); if(h&&h.parentNode) h.parentNode.insertBefore(d,h.nextSibling); else doc.body.insertBefore(d,doc.body.firstChild);
 }
 var PDFT={integral:'Valoración paliativa integral',pronostico:'Valoración pronóstica',opioides:'Rotación de opioides',nutricion:'Valoración nutricional',sedacion:'Indicación de sedación paliativa'};
